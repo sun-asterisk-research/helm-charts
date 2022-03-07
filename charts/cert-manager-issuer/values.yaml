@@ -1,0 +1,7 @@
+kind: Issuer
+
+acme:
+  server: https://acme-v02.api.letsencrypt.org/directory
+  email:
+
+ingressClass: nginx

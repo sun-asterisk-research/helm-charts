@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: {{ .Values.kind }}
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  acme:
+    server: {{ .Values.acme.server | quote }}
+    email: {{ .Values.acme.email | required "Email is required to acquire a TLS certificate" | quote }}
+    privateKeySecretRef:
+      name: {{ template "common.names.fullname" . }}-acme-key
+    solvers:
+    - http01:
+        ingress:
+          class: {{ .Values.ingressClass }}

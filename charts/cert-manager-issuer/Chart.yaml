@@ -1,0 +1,9 @@
+apiVersion: v2
+name: cert-manager-issuer
+description: Issuer for cert-manager
+type: application
+version: 0.1.0
+dependencies:
+- name: common
+  version: 1.4.3
+  repository: https://charts.bitnami.com/bitnami
