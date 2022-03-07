@@ -1,0 +1,4 @@
+# Packaged charts
+**/charts/*.tgz
+.deploy
+auth
