@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "beanstalkd.fullname" . }}
+  labels:
+    {{- include "beanstalkd.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  serviceName: {{ template "beanstalkd.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "beanstalkd.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "beanstalkd.labels" . | nindent 8 }}
+    spec:
+      {{- include "beanstalkd.imagePullSecrets" . | indent 6 }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ template "beanstalkd.fullname" . }}
+          image: {{ template "beanstalkd.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          args:
+            - -b
+            - /var/lib/beanstalkd
+            - -z
+            - {{ .Values.jobSize | quote }}
+            - -s
+            - {{ .Values.binlogSize | quote }}
+          ports:
+            - name: beanstalkd
+              containerPort: 11300
+              protocol: TCP
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          livenessProbe:
+            tcpSocket:
+              port: beanstalkd
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: beanstalkd
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+          - name: binlog
+            mountPath: /var/lib/beanstalkd
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- if .Values.persistence.enabled }}
+        {{- with .Values.persistence.existingClaim }}
+        - name: binlog
+          persistentVolumeClaim:
+            claimName: {{ tpl . $ }}
+        {{- end }}
+      {{- else }}
+        - name: binlog
+          emptyDir: {}
+      {{- end }}
+  {{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+  volumeClaimTemplates:
+  - metadata:
+      name: binlog
+      {{- with .Values.persistence.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
+    spec:
+      accessModes:
+      {{- range .Values.persistence.accessModes }}
+        - {{ . | quote }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ coalesce .Values.persistence.size .Values.binlogSize | quote }}
+      {{ include "beanstalkd.storageClass" . }}
+  {{- end }}

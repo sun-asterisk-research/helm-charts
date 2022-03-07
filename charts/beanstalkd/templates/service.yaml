@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "beanstalkd.fullname" . }}
+  labels:
+    {{- include "beanstalkd.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  clusterIP: None
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: beanstalkd
+    protocol: TCP
+  selector:
+    {{- include "beanstalkd.selectorLabels" . | nindent 4 }}

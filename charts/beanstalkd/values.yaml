@@ -1,0 +1,52 @@
+global:
+  imagePullSecrets: []
+
+image:
+  registry: docker.io
+  repository: schickling/beanstalkd
+  tag: latest
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 11300
+
+resources:
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  requests: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+persistence:
+  enabled: true
+  accessModes:
+  - ReadWriteOnce
+  size: 100Mi
+
+jobSize: "65535"
+binlogSize: "10485760"
