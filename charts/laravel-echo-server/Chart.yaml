@@ -1,0 +1,10 @@
+apiVersion: v2
+name: laravel-echo-server
+description: Laravel Echo server
+type: application
+version: 2.1.1
+appVersion: 1.6.2
+dependencies:
+- name: common
+  version: 0.2.0
+  repository: https://sun-asterisk-research.github.io/helm-charts

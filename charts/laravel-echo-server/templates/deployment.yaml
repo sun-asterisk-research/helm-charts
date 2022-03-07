@@ -1,0 +1,165 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  {{- if .Values.updateStrategy }}
+  strategy: {{ toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      annotations:
+        {{- include "laravel-echo-server.checksums" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "common.labels.standard" . | nindent 8 }}
+    spec:
+      {{- include "laravel-echo-server.imagePullSecrets" . | indent 6 }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: laravel-echo-server
+        image: {{ template "laravel-echo-server.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        command:
+        - sh
+        args:
+        - -c
+        - |
+          touch data/laravel-echo-server.db
+          yarn start
+        env:
+        - name: HOST
+          value: {{ .Values.server.host | quote }}
+        - name: PORT
+          value: {{ .Values.server.port | quote }}
+        - name: ENABLE_HTTP
+          value: {{ .Values.subscribers.http.enabled | quote }}
+        - name: ENABLE_REDIS
+          value: {{ .Values.subscribers.redis.enabled | quote }}
+        - name: AUTH_HOST
+          value: {{ tpl (.Values.auth.host | required "auth.host is required") . }}
+        - name: AUTH_ENDPOINT
+          value: {{ .Values.auth.endpoint | quote }}
+        - name: DATABASE
+          value: "sqlite"
+        - name: SQLITE_DB_PATH
+          value: "/data/laravel-echo-server.db"
+        {{- if .Values.subscribers.redis.enabled }}
+        {{- with .Values.subscribers.redis }}
+        - name: REDIS_HOST
+          value: {{ include "common.tplvalues.render" (dict "value" .host "context" $) | quote }}
+        - name: REDIS_PORT
+          value: {{ .port | quote }}
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              {{- if .passwordSecret }}
+              name: {{ include "common.tplvalues.render" (dict "value" .passwordSecret.name "context" $) }}
+              key: {{ .passwordSecret.key }}
+              {{- else }}
+              name: {{ include "common.names.fullname" $ }}-redis
+              key: redis-password
+              {{- end }}
+        - name: REDIS_KEY_PREFIX
+          value: {{ .keyPrefix | quote }}
+        - name: REDIS_DB
+          value: {{ .db | quote }}
+        {{- end }}
+        {{- end }}
+        - name: ALLOW_CORS
+          value: {{ .Values.cors.enabled | quote }}
+        - name: ALLOW_ORIGIN
+          value: {{ .Values.cors.allowOrigin | quote }}
+        - name: ALLOW_METHODS
+          value: {{ .Values.cors.allowMethods | quote }}
+        - name: ALLOW_HEADER
+          value: {{ .Values.cors.allowHeader | quote }}
+        - name: ENABLE_METRICS
+          value: {{ .Values.metrics.enabled | quote }}
+        - name: COLLECT_DEFAULT_METRICS
+          value: {{ .Values.metrics.collectDefaultMetrics | quote }}
+        - name: METRICS_PATH
+          value: {{ .Values.metrics.path | quote }}
+        - name: METRICS_PORT
+          value: {{ .Values.metrics.port | quote }}
+        - name: DEV_MODE
+          value: {{ .Values.devMode | quote }}
+        ports:
+        - name: echoserver
+          containerPort: 6001
+          protocol: TCP
+        {{- if .Values.metrics.enabled }}
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          tcpSocket:
+            port: echoserver
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          tcpSocket:
+            port: echoserver
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        {{- if .Values.subscribers.http.enabled }}
+        - mountPath: /laravel-echo-server/laravel-echo-server.json
+          name: clients
+          subPath: laravel-echo-server.json
+        {{- end }}
+        - name: data
+          mountPath: /laravel-echo-server/data
+      volumes:
+      {{- if .Values.subscribers.http.enabled }}
+      - name: clients
+        secret:
+          secretName: {{ include "common.names.fullname" . }}-clients
+      {{- end }}
+      - name: data
+      {{- if and .Values.persistence.enabled (not .Values.persistence.hostPath) }}
+        persistentVolumeClaim:
+          claimName: {{ include "common.names.fullname" . }}
+      {{- else if and .Values.persistence.enabled .Values.persistence.hostPath }}
+        hostPath:
+          path: {{ .Values.persistence.hostPath }}
+      {{- else }}
+        emptyDir: {}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.podAffinityPreset "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.podAntiAffinityPreset "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.nodeAffinityPreset.type "key" .Values.nodeAffinityPreset.key "values" .Values.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
+      {{- end }}

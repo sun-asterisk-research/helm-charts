@@ -1,0 +1,119 @@
+global:
+  imagePullSecrets: []
+
+image:
+  registry: docker.io
+  repository: sunasteriskrnd/laravel-echo-server
+  tag: 1.6.2-r2
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+server:
+  host: 0.0.0.0
+  port: 6001
+
+subscribers:
+  http:
+    enabled: false
+    clients: []
+    # - appId: myapp
+    #   key: myapikey
+  redis:
+    enabled: true
+    host: localhost
+    port: 6379
+    password: ""
+    passwordSecret:
+      # name:
+      # key:
+    db: 0
+    keyPrefix: ""
+
+auth:
+  host: http://localhost
+  endpoint: "/broadcasting/auth"
+
+cors:
+  enabled: false
+  allowOrigins:
+  allowMethods:
+  allowHeaders:
+
+metrics:
+  enabled: false
+  collectDefaultMetrics: false
+  path: /metrics
+  port: 9090
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+
+devMode: false
+
+service:
+  type: ClusterIP
+  port: 6001
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 60
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
+ingress:
+  enabled: false
+  certManager: false
+  hosts: []
+  # - host: 'example.com'
+  #   paths: ['/socket.io']
+  tls: []
+  annotations: {}
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 200m
+  #   memory: 256Mi
+
+podAnnotations: {}
+
+podSecurityContext:
+  enabled: false
+
+podAffinityPreset: ""
+
+podAntiAffinityPreset: soft
+
+nodeAffinityPreset:
+  type: ""
+  key: ""
+  values: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+persistence:
+  enabled: false
+  hostPath:
+  storageClass:
+  accessModes: []
+  size: 1Gi
