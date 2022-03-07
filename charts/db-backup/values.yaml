@@ -1,0 +1,68 @@
+image:
+  registry: docker.io
+  repository: sunasteriskrnd/db-backup
+  tag: 0.2.0
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+
+fullnameOverride: ""
+
+defaultSchedule: "0 0 * * *"
+
+databases: []
+# - type: mariadb
+#   host: localhost
+#   port: 3306
+#   name: mydb
+#   user: mydb
+#   password: mydbpassword
+#   existingPasswordSecret:
+#     name: my-password-secret
+#     key: password
+#   schedule: "0 0 * * *"
+#   subPath: mydb
+#   backupRetention:
+#     files: 10
+#     days: 30
+
+# Backup container timezone
+timezone: UTC
+
+cronjob:
+  enabled: true
+  annotations: {}
+  concurrencyPolicy: ""
+  failedJobsHistoryLimit: ""
+  successfulJobsHistoryLimit: ""
+  jobBackoffLimit: 0
+  podRestartPolicy: Never
+
+## Persist data to a persitent volume
+persistence:
+  enabled: true
+  hostPath:
+  # storageClass
+  accessModes: ReadWriteOnce
+  size: 10Gi
+
+priorityClassName: ""
+
+commonAnnotations: {}
+
+podAnnotations: {}
+
+nodeAffinityPreset:
+  type: ""
+  key: ""
+  values: []
+
+affinity: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+resources:
+  limits: {}
+  requests: {}

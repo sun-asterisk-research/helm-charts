@@ -1,0 +1,146 @@
+{{- if .Values.cronjob.enabled -}}
+{{- range .Values.databases }}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "common.names.fullname" $ }}-{{ regexReplaceAll "[^a-zA-Z0-9.-]" .name "-" }}
+  labels:
+    {{- include "common.labels.standard" $ | nindent 4 }}
+  {{- if or $.Values.persistence.annotations $.Values.commonAnnotations }}
+  annotations:
+    {{- with $.Values.cronjob.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $.Values.commonAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  schedule: {{ .schedule | default $.Values.defaultSchedule | quote }}
+  {{- with $.Values.cronjob.concurrencyPolicy }}
+  concurrencyPolicy: {{ . }}
+  {{- end }}
+  {{- with $.Values.cronjob.failedJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ . }}
+  {{- end }}
+  {{- with $.Values.cronjob.successfulJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ . }}
+  {{- end }}
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "common.labels.standard" $ | nindent 8 }}
+    spec:
+      backoffLimit: {{ $.Values.cronjob.jobBackoffLimit }}
+      template:
+        metadata:
+          labels:
+            {{- include "common.labels.standard" $ | nindent 12 }}
+          {{- with $.Values.cronjob.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        spec:
+          {{- include "db-backup.imagePullSecrets" $ | nindent 10 }}
+          restartPolicy: {{ $.Values.cronjob.podRestartPolicy }}
+          {{- with $.Values.cronjob.priorityClassName }}
+          priorityClassName: {{ . | quote }}
+          {{- end }}
+          {{- if $.Values.affinity }}
+          affinity: {{- include "common.tplvalues.render" (dict "value" $.Values.affinity "context" $) | nindent 12 }}
+          {{- else }}
+          affinity:
+            nodeAffinity: {{- include "common.affinities.nodes" (dict "type" $.Values.nodeAffinityPreset.type "key" $.Values.nodeAffinityPreset.key "values" $.Values.nodeAffinityPreset.values) | nindent 14 }}
+          {{- end }}
+          {{- with $.Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if $.Values.securityContext }}
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          {{- end }}
+          containers:
+          - image: {{ include "db-backup.image" $ }}
+            imagePullPolicy: {{ $.Values.image.pullPolicy }}
+            name: db-backup
+            env:
+            - name: DB_TYPE
+              value: {{ .type | quote }}
+            - name: DB_HOST
+              value: {{ tpl .host $ | quote }}
+            - name: DB_PORT
+              value: {{ .port | quote }}
+            - name: DB_DATABASE
+              value: {{ .name | quote }}
+            - name: DB_USER
+              value: {{ .user | quote }}
+            - name: DB_PASSWORD
+            {{- if .existingPasswordSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ tpl .existingPasswordSecret.name $ }}
+                  key: {{ .existingPasswordSecret.key }}
+            {{- else }}
+              value: {{ .password | quote }}
+            {{- end }}
+            {{- with .extraOpts }}
+            - name: DB_BACKUP_EXTRA_OPTS
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .fileExtension }}
+            - name: DB_BACKUP_FILE_EXTENSION
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .compression }}
+            - name: DB_BACKUP_COMPRESSION
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .backupRetention }}
+            - name: DB_BACKUP_MAX_FILES
+              value: {{ .files | default 10 | quote }}
+            - name: DB_BACKUP_MAX_DAYS
+              value: {{ .days | default 30 | quote }}
+            {{- end }}
+            {{- with $.Values.timezone }}
+            - name: TZ
+              value: {{ . | quote }}
+            {{- end }}
+            command: ["db-backup"]
+            {{- with $.Values.args }}
+            args:
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with $.Values.resources }}
+            resources:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            volumeMounts:
+            - name: data
+              mountPath: /data/backup
+          volumes:
+          - name: data
+          {{- if and $.Values.persistence.enabled (not $.Values.persistence.hostPath) }}
+            persistentVolumeClaim:
+              claimName: {{ include "common.names.fullname" $ }}
+          {{- else if and $.Values.persistence.enabled $.Values.persistence.hostPath }}
+            hostPath:
+              {{- if .subPath }}
+              path: {{ $.Values.persistence.hostPath }}/{{ .subPath }}
+              {{- else }}
+              path: {{ $.Values.persistence.hostPath }}
+              {{- end }}
+          {{- else }}
+            emptyDir: {}
+          {{- end }}
+{{- end }}
+{{- end -}}
