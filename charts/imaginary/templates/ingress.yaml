@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "common.names.fullname" . -}}
+apiVersion: {{ template "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+  annotations:
+  {{- if .Values.ingress.certManager }}
+    kubernetes.io/tls-acme: "true"
+  {{- end }}
+  {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.tls }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.host }}
+    secretName: {{ $fullName }}-tls
+  {{- end }}
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - path: {{ .Values.options.pathPrefix | default "/" }}
+        {{ template "common.ingress.pathType" (dict "context" $ "value" $.Values.ingress.pathType) }}
+        backend: {{- include "common.ingress.backend" (dict "serviceName" $fullName "servicePort" "http" "context" $) | nindent 14 }}
+{{- end }}

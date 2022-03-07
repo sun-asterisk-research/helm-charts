@@ -1,0 +1,10 @@
+apiVersion: v2
+name: imaginary
+description: Fast, simple, scalable, Docker-ready HTTP microservice for high-level image processing
+type: application
+version: 0.2.0
+appVersion: 1.2.4
+dependencies:
+- name: common
+  version: 0.2.0
+  repository: https://sun-asterisk-research.github.io/helm-charts

@@ -1,0 +1,152 @@
+global:
+  imagePullSecrets: []
+
+image:
+  registry: docker.io
+  repository: h2non/imaginary
+  pullPolicy: IfNotPresent
+  tag: "1.2.4"
+  pullSecrets: []
+
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  nodePort:
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: imaginary.local
+      paths: []
+  tls: []
+  #  - secretName: imaginary-tls
+  #    hosts:
+  #      - imaginary.local
+
+options: {}
+  ## Url path prefix to listen to [default: "/"]
+  # pathPrefix: "/nya"
+
+  ## Enable CORS support
+  # cors: true
+
+  ## Enable gzip compression (deprecated)
+  # gzip: true
+
+  ## Comma separated endpoints to disable. E.g: form,crop,rotate,health
+  # disableEndpoints: "form,crop,rotate,health"
+
+  ## Define API key for authorization
+  # key: "ChangeMePlease"
+
+  ## Mount server local directory
+  # mount: "/mount/dir"
+
+  ## The TTL in seconds. Adds caching headers to locally served files.
+  # httpCacheTTL: 300
+
+  ## HTTP read timeout in seconds [default: 30]
+  # httpReadTimeout: "23"
+
+  ## HTTP write timeout in seconds [default: 30]
+  # httpWriteTimeout: "42"
+
+  ## Restrict remote image source processing to certain origins (separated by commas)
+  # enableURLSource: true
+
+  ## Enable image response placeholder to be used in case of error
+  # enablePlaceholder: true
+
+  ## Forwards X-Forward-Authorization or Authorization header to the image
+  ## source server. -enable-url-source flag must be defined.
+  ## Tip: secure your server from public access to prevent attack vectors
+  # enableAuthForwarding: true
+
+  ## Enable URL signature (URL-safe Base64-encoded HMAC digest) [default: false]
+  # enableURLSignature: true
+
+  ## The URL signature key (32 characters minimum)
+  # urlSignatureKey: EXAMPLEaeth7aiphopoo7laezohtai9M
+
+  ## Restrict remote image source processing to certain origins (separated by commas)
+  # allowedOrigins: "http://localhost,http://example.com"
+
+  ## Restrict maximum size of http image source (in bytes)
+  # maxAllowedSize: 31337
+
+  ## Defines a constant Authorization header value passed to all the image
+  ## source servers. -enable-url-source flag must be defined. This overwrites
+  ## authorization headers forwarding behavior via X-Forward-Authorization
+  # authorization: "Basic AwDJdL2DbwrD=="
+
+  ## Image path to image custom placeholder to be used in case of error.
+  ## Recommended minimum image size is: 1200x1200
+  # placeholder: "/neko.jpg"
+
+  ## Throttle concurrency limit per second
+  # concurrency: "13"
+
+  ## Throttle burst max cache size [default: 100]
+  # burst: "23"
+
+  ## OS memory release interval in seconds [default: 30]
+  # mrelease: "42"
+
+  ## Number of used cpu cores.
+  # cpus: "32"
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 60
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 50
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 500m
+  #   memory: 1Gi
+
+podAnnotations: {}
+
+podSecurityContext:
+  enabled: false
+
+podAffinityPreset: ""
+
+podAntiAffinityPreset: soft
+
+nodeAffinityPreset:
+  type: ""
+  key: ""
+  values: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+volumeMount:
+  enabled: false
+  hostPath:
+  existingClaim:
