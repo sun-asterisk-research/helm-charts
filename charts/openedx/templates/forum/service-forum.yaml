@@ -1,0 +1,15 @@
+{{- if .Values.forum.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openedx.fullname" . }}-forum
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4567
+      protocol: TCP
+  selector:
+    {{- include "openedx.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: forum
+{{- end }}

@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "openedx.fullname" . }}-lms-job
+  labels:
+    {{- include "openedx.labels" . | nindent 4 }}
+  annotations:
+    {{- include "openedx.podAnnotations" . | nindent 4 }}
+  #   "helm.sh/hook": post-install
+  #   "helm.sh/hook-weight": "-5"
+  #   "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: {{ template "openedx.fullname" . }}-lms
+      labels:
+        {{- include "openedx.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      containers: 
+        - name: {{ template "openedx.fullname" . }}-lms
+          image: {{ .Values.openedx.image }}
+          volumeMounts:
+            - mountPath: /openedx/edx-platform/lms/envs/tutor/
+              name: settings-lms
+            - mountPath: /openedx/edx-platform/cms/envs/tutor/
+              name: settings-cms
+            - mountPath: /openedx/config
+              name: config
+          command: ["/bin/bash", "-c", "DJANGO_SETTINGS_MODULE=lms.envs.tutor.production ./manage.py lms migrate"]
+      initContainers:
+        - name: wait-for-job-cms-done
+          image: {{ .Values.openedx.jobs.image }}
+          args:
+            - "job"
+            - "{{ template "openedx.fullname" . }}-cms-job"
+      volumes:
+        - name: settings-lms
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-settings-lms
+        - name: settings-cms
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-settings-cms
+        - name: config
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-config      

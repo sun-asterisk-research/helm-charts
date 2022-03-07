@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "openedx.fullname" . }}-openedx-settings-lms
+  labels:
+    {{- include "openedx.labels" . | nindent 4 }}
+data:
+  __init__.py: |
+{{ tpl (.Files.Get "settings/lms/__init__.py") . | indent 4 }}
+
+  development.py: |
+{{ tpl (.Files.Get "settings/lms/development.py") . | indent 4 }}
+
+  production.py: |
+{{ tpl (.Files.Get "settings/lms/production.py") . | indent 4 }}
+
+  test.py: |
+{{ tpl (.Files.Get "settings/lms/test.py") . | indent 4 }}
+    

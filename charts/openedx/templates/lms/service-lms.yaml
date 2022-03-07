@@ -1,0 +1,16 @@
+
+{{- if .Values.lms.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openedx.fullname" . }}-lms
+spec:
+  type: {{ .Values.lms.service.type }}
+  ports:
+    - port: {{ .Values.lms.service.port }}
+      protocol: TCP
+  selector:
+    {{- include "openedx.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: lms
+{{- end }}

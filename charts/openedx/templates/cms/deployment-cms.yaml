@@ -1,0 +1,56 @@
+{{- if .Values.cms.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "openedx.fullname" . }}-cms
+  labels:
+    {{- include "openedx.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "openedx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: cms
+  template:
+    metadata:
+      annotations:
+        {{- include "openedx.podAnnotations" . | nindent 8 }}
+      labels:
+        {{- include "openedx.labels" . | nindent 8 }}
+        app.kubernetes.io/component: cms
+    spec:
+      containers:
+        - name: {{ template "openedx.fullname" . }}-cms
+          image: docker.io/overhangio/openedx:11.1.3
+          env:
+          - name: SERVICE_VARIANT
+            value: cms
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - mountPath: /openedx/edx-platform/lms/envs/tutor/
+              name: settings-lms
+            - mountPath: /openedx/edx-platform/cms/envs/tutor/
+              name: settings-cms
+            - mountPath: /openedx/config
+              name: config
+          resources:
+            requests:
+              memory: 2Gi
+      volumes:
+        - name: settings-lms
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-settings-lms
+        - name: settings-cms
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-settings-cms
+        - name: config
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-config
+      initContainers:
+        - name: wait-for-job-cms
+          image: {{ .Values.openedx.jobs.image }}
+          args:
+            - "job"
+            - "{{ template "openedx.fullname" . }}-cms-job"
+{{- end }}

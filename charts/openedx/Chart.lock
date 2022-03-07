@@ -1,0 +1,15 @@
+dependencies:
+- name: minio
+  repository: https://charts.bitnami.com/bitnami
+  version: 6.1.1
+- name: mongodb
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.6.1
+- name: mariadb
+  repository: https://charts.bitnami.com/bitnami
+  version: 9.3.2
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.7.0
+digest: sha256:1ddc2ac0f9d20b7d7af9bb6cfdf6825b4562e701adabcda3e40c461278bb53da
+generated: "2021-02-19T13:43:01.082622474+07:00"

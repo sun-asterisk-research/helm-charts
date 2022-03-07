@@ -1,0 +1,48 @@
+{{- if .Values.lms.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "openedx.fullname" . }}-lms-worker
+  labels:
+    {{- include "openedx.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "openedx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: lms-worker
+  template:
+    metadata:
+      annotations:
+        {{- include "openedx.podAnnotations" . | nindent 8 }}
+      labels:
+        {{- include "openedx.labels" . | nindent 8 }}
+        app.kubernetes.io/component: lms-worker
+    spec:
+      containers:
+        - name: {{ template "openedx.fullname" . }}-lms-worker
+          image: {{ .Values.openedx.image }}
+          args: ["celery", "worker", "--app=cms.celery", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.cms.core.default"]
+          env:
+          - name: SERVICE_VARIANT
+            value: lms
+          - name: C_FORCE_ROOT
+            value: "1"
+          volumeMounts:
+            - mountPath: /openedx/edx-platform/lms/envs/tutor/
+              name: settings-lms
+            - mountPath: /openedx/edx-platform/cms/envs/tutor/
+              name: settings-cms
+            - mountPath: /openedx/config
+              name: config
+      volumes:
+        - name: settings-lms
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-settings-lms
+        - name: settings-cms
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-settings-cms
+        - name: config
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-config
+{{- end }}

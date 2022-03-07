@@ -1,0 +1,25 @@
+{{- if .Values.smtp.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "openedx.fullname" . }}-smtp
+  labels:
+    {{- include "openedx.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "openedx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: smtp
+  template:
+    metadata:
+      labels:
+        {{- include "openedx.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: smtp
+    spec:
+      containers:
+        - name: smtp
+          image: {{ .Values.smtp.image }}
+          ports:
+            - containerPort: 25
+{{- end }}

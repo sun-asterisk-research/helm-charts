@@ -1,0 +1,15 @@
+{{- if .Values.smtp.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openedx.fullname" . }}-smtp
+spec:
+  type: ClusterIP
+  ports:
+    - port: 25
+      protocol: TCP
+  selector:
+    {{- include "openedx.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: smtp
+{{- end }}

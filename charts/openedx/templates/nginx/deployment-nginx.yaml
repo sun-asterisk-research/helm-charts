@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "openedx.fullname" . }}-nginx
+  labels:
+    {{- include "openedx.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "openedx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: nginx
+  template:
+    metadata:
+      annotations:
+        checksum/configmapNginx: {{ include (print $.Template.BasePath "/nginx/configmap-nginx.yaml") . | sha256sum }}
+      labels:
+        {{- include "openedx.labels" . | nindent 8 }}
+        app.kubernetes.io/component: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: {{ .Values.nginx.image | quote }}
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/
+              name: config
+          ports:
+            - containerPort: 80
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "openedx.fullname" . }}-nginx-config

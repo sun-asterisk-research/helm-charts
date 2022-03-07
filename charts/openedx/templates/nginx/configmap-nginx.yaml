@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "openedx.fullname" . }}-nginx-config
+  labels: 
+    {{- include "openedx.labels" . | nindent 4 }}
+data:
+  extra.conf: |
+    {{ include "openedx.python-settings" .Values.nginx.config.extra }}
+
+  _tutor.conf: |
+{{ tpl (.Files.Get "nginx/_tutor.conf") . | indent 4 }}
+
+  cms.conf: |
+{{ tpl (.Files.Get "nginx/cms.conf") . | indent 4 }}
+
+  lms.conf: |
+{{ tpl (.Files.Get "nginx/lms.conf") . | indent 4 }}

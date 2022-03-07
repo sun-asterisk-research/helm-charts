@@ -1,0 +1,41 @@
+{{ if .Values.elasticsearch.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "openedx.fullname" . }}-elasticsearch
+  labels:
+    {{- include "openedx.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "openedx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: elasticsearch
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "openedx.labels" . | nindent 8 }}
+        app.kubernetes.io/component: elasticsearch
+    spec:
+      containers:
+        - name: {{ template "openedx.fullname" . }}-elasticsearch
+          image: {{ .Values.elasticsearch.image | quote }}
+          env:
+            - name: ES_JAVA_OPTS
+              value: "-Xms1g -Xmx1g"
+            - name: "cluster.name"
+              value: openedx
+            - name: "bootstrap.memory_lock"
+              value: "true"
+          ports:
+            - containerPort: 9200
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/data
+              name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ template "openedx.fullname" . }}-elasticsearch-pvc
+{{ end }}

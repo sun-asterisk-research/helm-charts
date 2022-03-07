@@ -1,0 +1,56 @@
+{{- if .Values.lms.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "openedx.fullname" . }}-lms
+  labels:
+    {{- include "openedx.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "openedx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: lms
+  template:
+    metadata:
+      annotations:
+        {{- include "openedx.podAnnotations" . | nindent 8 }}
+      labels:
+        {{- include "openedx.labels" . | nindent 8 }}
+        app.kubernetes.io/component: lms
+    spec:
+      containers:
+        - name: {{ template "openedx.fullname" . }}-lms
+          image: {{ .Values.openedx.image }}
+          env:
+          - name: DJANGO_SETTINGS_MODULE
+            value: lms.envs.tutor.production
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - mountPath: /openedx/edx-platform/lms/envs/tutor/
+              name: settings-lms
+            - mountPath: /openedx/edx-platform/cms/envs/tutor/
+              name: settings-cms
+            - mountPath: /openedx/config
+              name: config
+          resources:
+            requests:
+              memory: 2Gi
+      volumes:
+        - name: settings-lms
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-settings-lms
+        - name: settings-cms
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-settings-cms
+        - name: config
+          configMap:
+            name: {{ template "openedx.fullname" . }}-openedx-config
+      initContainers:
+        - name: wait-for-job-lms
+          image: {{ .Values.openedx.jobs.image }}
+          args:
+            - "job"
+            - "{{ template "openedx.fullname" . }}-lms-job"
+{{- end }}

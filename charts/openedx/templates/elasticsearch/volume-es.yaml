@@ -1,0 +1,15 @@
+{{ if .Values.elasticsearch.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "openedx.fullname" . }}-elasticsearch-pvc
+  labels:
+    {{- include "openedx.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.elasticsearch.volume.requests.storage }}
+{{ end }}

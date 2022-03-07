@@ -1,0 +1,15 @@
+{{- if .Values.cms.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openedx.fullname" . }}-cms
+spec:
+  type: {{ .Values.cms.service.type }}
+  ports:
+    - port: {{ .Values.cms.service.port }}
+      protocol: TCP
+  selector:
+    {{- include "openedx.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: cms
+{{- end }}

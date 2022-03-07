@@ -1,0 +1,15 @@
+{{ if .Values.elasticsearch.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openedx.fullname" . }}-elasticsearch
+spec:
+  type: {{ .Values.elasticsearch.service.type }}
+  ports:
+    - port: {{ .Values.elasticsearch.service.port }}
+      protocol: TCP
+  selector:
+    app.kubernetes.io/component: elasticsearch
+    {{- include "openedx.selectorLabels" . | nindent 4 }}
+{{ end }}

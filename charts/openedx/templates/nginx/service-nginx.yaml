@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openedx.fullname" . }}-nginx
+spec:
+  type: {{ .Values.nginx.service.type }}
+  ports:
+    - port: {{ .Values.nginx.service.port }}
+      name: http
+  selector:
+    app.kubernetes.io/component: nginx
+    {{- include "openedx.selectorLabels" . | nindent 4 }}
