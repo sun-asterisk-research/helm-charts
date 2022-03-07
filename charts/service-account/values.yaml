@@ -1,0 +1,40 @@
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  name: ""
+  annotations: {}
+
+role:
+  kind: Role
+  rules: []
+  rulesPreset:
+
+existingRole: {}
+  # kind: Role
+  # name: role-name
+
+presets:
+  deployer:
+  - apiGroups:
+    - ''
+    resources:
+    - configmaps
+    - pods
+    - secrets
+    - serviceaccounts
+    - services
+    - persistentvolumeclaims
+    verbs:
+    - '*'
+  - apiGroups:
+    - apps
+    - autoscaling
+    - extensions
+    - networking.k8s.io
+    - rbac.authorization.k8s.io
+    - batch/v1beta1
+    resources:
+    - '*'
+    verbs:
+    - '*'

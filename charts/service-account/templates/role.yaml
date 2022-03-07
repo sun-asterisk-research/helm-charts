@@ -1,0 +1,14 @@
+{{- if or (empty .Values.existingRole.kind) (empty .Values.existingRole.name) -}}
+{{- $rules := .Values.role.rules -}}
+{{- if .Values.role.rulesPreset -}}
+{{- $rules = concat (index .Values.presets .Values.role.rulesPreset) $rules -}}
+{{- end -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: {{ include "deployer.role.kind" . }}
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+{{- if not (empty $rules) }}
+rules: {{ $rules | toYaml | nindent 0 }}
+{{- end }}
+{{- end -}}

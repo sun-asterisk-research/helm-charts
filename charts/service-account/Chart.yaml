@@ -1,0 +1,9 @@
+apiVersion: v2
+name: service-account
+description: Service account to enable access from automated systems
+type: application
+version: 1.0.0
+dependencies:
+- name: common
+  version: 1.11.3
+  repository: https://charts.bitnami.com/bitnami

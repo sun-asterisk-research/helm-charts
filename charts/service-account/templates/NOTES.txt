@@ -1,0 +1,3 @@
+Run this command to get the JWT token for the ServiceAccount:
+
+  kubectl -n {{ .Release.Namespace }} get secret $(kubectl -n  {{ .Release.Namespace }} get secret | grep {{ include "common.names.fullname" . }}-token | awk '{print $1}') -o jsonpath='{.data.token}' | base64 --decode
