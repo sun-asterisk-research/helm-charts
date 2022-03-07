@@ -1,0 +1,138 @@
+replicaCount: 1
+
+image:
+  registry: docker.io
+  repository: metabase/metabase
+  tag:
+  command: []
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+
+fullnameOverride: ""
+
+site:
+  name: Metabase
+  url: ""
+  locale: en
+
+encryptionKey: ""
+
+adminEmail: ""
+
+# Backend database
+database:
+  # Available values are h2, mysql and postgres
+  type: h2
+  host: localhost
+  port: ""
+  dbname: ""
+  username: ""
+  password: ""
+
+dw:
+  maxConnectionPoolSize: 15
+
+googleSignIn:
+  clientID: ""
+  autoCreateAccountForDomain: ""
+
+passwordLength: 6
+# Available values are
+# weak: no constraint
+# normal: at least 1 digit (default)
+# strong: minimum 8 characters with at least 2 lowercases, 2 uppercases, 1 digit, and 1 special character
+passwordComplexity: normal
+
+mail:
+  from: ""
+  smtp:
+    host: ""
+    port: 587
+    username: ""
+    password: ""
+    encryption: none
+
+jetty:
+  host: "0.0.0.0"
+  port: 3000
+  maxThreads: 50
+  minThreads: 8
+
+telemetry: false
+
+timezone: UTC
+
+javaOpts: ""
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
+service:
+  type: ClusterIP
+  port: 80
+  nodePort: ""
+  annotations: {}
+
+ingress:
+  enabled: false
+  ingressClassName:
+  host: metabase.local
+  # The ingress path. Useful to host metabase on a subpath, such as `/metabase`.
+  path: /
+  pathType: ImplementationSpecific
+  annotations: {}
+  tls: false
+  certManager: false
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 200m
+  #   memory: 256Mi
+
+podAnnotations: {}
+
+podSecurityContext:
+  enabled: false
+
+podAffinityPreset: ""
+
+podAntiAffinityPreset: soft
+
+nodeAffinityPreset:
+  type: ""
+  key: ""
+  values: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Whether to enable persistence, only when using h2 database
+persistence:
+  enabled: false
+  annotations: {}
+  hostPath:
+  storageClass:
+  accessModes: []
+  size: 1Gi

@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  labels: {{ include "common.labels.standard" . | nindent 4 }}
+data:
+  MB_SITE_NAME: {{ .Values.site.name | quote }}
+  {{- if .Values.site.url }}
+  MB_SITE_URL: {{ .Values.site.url | quote }}
+  {{- end }}
+  MB_SITE_LOCALE: {{ .Values.site.locale | quote }}
+  MB_DB_TYPE: {{ .Values.database.type | quote }}
+  {{- if not (eq .Values.database.type "h2") }}
+  MB_DB_HOST: {{ .Values.database.host | quote }}
+  MB_DB_PORT: {{ .Values.database.port | quote }}
+  MB_DB_DBNAME: {{ .Values.database.dbname | quote }}
+  {{- end }}
+  MB_APPLICATION_DB_MAX_CONNECTION_POOL_SIZE: {{ .Values.dw.maxConnectionPoolSize | quote }}
+  MB_PASSWORD_COMPLEXITY: {{ .Values.passwordComplexity | quote }}
+  MB_PASSWORD_LENGTH: {{ .Values.passwordLength | quote }}
+  MB_JETTY_HOST: {{ .Values.jetty.host | quote }}
+  MB_JETTY_PORT: {{ .Values.jetty.port | quote }}
+  MB_JETTY_MAXTHREADS: {{ .Values.jetty.maxThreads | quote }}
+  MB_JETTY_MINTHREADS: {{ .Values.jetty.minThreads | quote }}
+  MB_ADMIN_EMAIL: {{ .Values.adminEmail | quote }}
+  MB_EMAIL_SMTP_HOST: {{ .Values.mail.smtp.host | quote }}
+  MB_EMAIL_SMTP_PORT: {{ .Values.mail.smtp.port | quote }}
+  MB_EMAIL_SMTP_SECURITY: {{ .Values.mail.smtp.encryption | quote }}
+  MB_EMAIL_FROM_ADDRESS: {{ .Values.mail.from | quote }}
+  MB_GOOGLE_AUTH_CLIENT_ID: {{ .Values.googleSignIn.clientID | quote }}
+  MB_GOOGLE_AUTH_AUTO_CREATE_ACCOUNTS_DOMAIN: {{ .Values.googleSignIn.autoCreateAccountForDomain | quote }}
+  MB_ANON_TRACKING_ENABLED: {{ .Values.telemetry | quote }}
+  JAVA_TIMEZONE: {{ .Values.timezone | quote }}
+  TZ: {{ .Values.timezone | quote }}
+  {{- if .Values.javaOpts }}
+  JAVA_OPTS: {{ .Values.javaOpts | quote }}
+  {{- end }}
