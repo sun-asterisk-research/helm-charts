@@ -1,0 +1,48 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "common.names.fullname" . -}}
+{{- $svcName := include "common.names.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+apiVersion: {{ template "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+  annotations:
+    {{- if .Values.ingress.certManager }}
+    kubernetes.io/tls-acme: "true"
+    {{- end }}
+    {{- if and .Values.ingress.ingressClassName (eq "false" (include "common.ingress.supportsIngressClassname" .)) }}
+    kubernetes.io/ingress.class: {{ .Values.ingress.ingressClassName | quote }}
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if and .Values.ingress.ingressClassName (include "common.ingress.supportsIngressClassname" .) }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+  {{- range .Values.ingress.hosts }}
+  - hosts:
+    - {{ .host }}
+    {{- if $.Values.ingress.certManager }}
+    secretName: {{ printf "%s-tls" .host }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  rules:
+  {{- range .Values.ingress.hosts }}
+  - host: {{ .host | quote }}
+    http:
+      paths:
+      {{- range (.paths | default (list (dict "path" "/"))) }}
+      - path: {{ .path }}
+        {{- if eq "true" (include "common.ingress.supportsPathType" $) }}
+        pathType: {{ .pathType | default "ImplementationSpecific" }}
+        {{- end }}
+        backend: {{- include "common.ingress.backend" (dict "serviceName" $svcName "servicePort" "http" "context" $) | nindent 10 }}
+      {{- end }}
+  {{- end }}
+{{- end }}
