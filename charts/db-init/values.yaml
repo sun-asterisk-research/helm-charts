@@ -1,0 +1,38 @@
+image:
+  registry: docker.io
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+dbType: mysql
+
+mysql:
+  image:
+    repository: bitnami/mariadb
+    tag: 10.5.12-debian-10-r9
+  host: localhost
+  port: 3306
+  rootUser: root
+  rootPassword:
+
+postgresql:
+  image:
+    repository: bitnami/postgresql
+    tag: 13.4.0-debian-10-r3
+  host: localhost
+  port: 5432
+  postgresPassword:
+
+users: []
+# - username:
+#   password:
+#   forcePassword: false
+
+databases: {}
+  # mydatabase:
+  #   ownner: mydatabase_owner
+  #   readonly:
+  #   - mydatabase_reader
+  #   readwrite:
+  #   - mydatabase_writer
+  #   extensions:
+  #   - pg_stat_statements

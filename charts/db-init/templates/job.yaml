@@ -1,0 +1,69 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+  annotations:
+    checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    checksum/init-db-script: {{ include (print $.Template.BasePath "/init-db-script.yaml") . | sha256sum }}
+    checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+spec:
+  template:
+    metadata:
+      name: {{ template "common.names.fullname" . }}
+      labels:
+        {{- include "common.labels.standard" . | nindent 8 }}
+    spec:
+      {{- include "db-init.imagePullSecrets" . | indent 6 }}
+      restartPolicy: Never
+      containers:
+      - name: init-db
+        image: {{ template "db-init.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - bash
+        args:
+        - -c
+        - |
+          echo "[InitDB] Waiting for $DB_HOST:$DB_PORT."
+
+          TIMEOUT=600
+          tick=0
+
+          while :
+          do
+            tick=$((tick+1))
+
+            (echo -n > /dev/tcp/$DB_HOST/$DB_PORT) >/dev/null 2>&1
+            result=$?
+
+            if [[ $result -eq 0 ]]; then
+                break
+            fi
+
+            if [[ $tick -ge TIMEOUT ]]; then
+                echo "[InitDB] Timed out waiting for $DB_HOST:$DB_PORT."
+                exit 1
+            fi
+
+            sleep 1
+          done
+
+          echo "[InitDB] $DB_HOST:$DB_PORT is reachable, running init db scripts."
+          {{ .Files.Get (printf "scripts/%s-init.sh" .Values.dbType) | nindent 10 }}
+          if [[ $? -eq 0 ]]; then
+            echo "[InitDB] Script finished successfully."
+          fi
+        envFrom:
+        - configMapRef:
+            name: {{ template "common.names.fullname" . }}
+        - secretRef:
+            name: {{ template "common.names.fullname" . }}
+        volumeMounts:
+        - mountPath: /opt/script
+          name: init-db-script
+      volumes:
+      - name: init-db-script
+        secret:
+          secretName: {{ template "common.names.fullname" . }}-script
