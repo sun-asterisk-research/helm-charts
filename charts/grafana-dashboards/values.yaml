@@ -1,0 +1,22 @@
+nameOverride: ""
+fullnameOverride: ""
+
+# Common labels and annotations
+commonLabels: {}
+commonAnnotations: {}
+
+# Dashboards included by default
+defaultDashboards:
+- nodes
+
+# Whether to include default dashboards when extra dashboards is set
+includeDefaultDashboards: true
+
+# Extra dashboards to include
+dashboards: []
+# - kube-resources
+# - nginx-ingress-controller
+# - nginx-ingress-requests
+
+# Annotation to put folder name on, used for dashboards provisioning
+folderAnnotation:
