@@ -1,0 +1,108 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+
+nameOverride: ""
+
+fullnameOverride: ""
+
+redis:
+  architecture: replication
+
+  sentinel:
+    enabled: true
+    downAfterMilliseconds: 30000
+    failoverTimeout: 180000
+
+haproxy:
+  image:
+    registry: docker.io
+    repository: bitnami/haproxy
+    tag: 2.4.0-debian-10-r78
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+
+  replicaCount: 1
+
+  updateStrategy:
+    type: RollingUpdate
+
+  timeout:
+    connect: 4s
+    server: 30s
+    client: 30s
+    check: 2s
+
+  check:
+    interval: 1s
+    fall: 1
+    rise: 1
+
+  service:
+    type: ClusterIP
+    port: 6379
+    nodePort: ""
+    externalTrafficPolicy: Cluster
+    clusterIP: ""
+    loadBalancerSourceRanges: []
+
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 5
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 5
+
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  podAnnotations: {}
+
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+
+  podAffinityPreset: ""
+
+  podAntiAffinityPreset: soft
+
+  nodeAffinityPreset:
+    type: ""
+    key: ""
+    values: []
+
+  affinity: {}
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  spreadConstraints: {}
+
+pdb:
+  create: false
+  minAvailable: 1
+  maxUnavailable: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""

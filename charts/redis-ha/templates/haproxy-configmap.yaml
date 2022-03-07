@@ -1,0 +1,43 @@
+{{- $fullName := include "common.names.fullname" . -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-haproxy
+  labels: {{ include "common.labels.standard" . | nindent 4 }}
+data:
+  haproxy.cfg: |
+    defaults REDIS
+      mode tcp
+      timeout connect {{ .Values.haproxy.timeout.connect }}
+      timeout server {{ .Values.haproxy.timeout.server }}
+      timeout client {{ .Values.haproxy.timeout.client }}
+      timeout check {{ .Values.haproxy.timeout.check }}
+
+    listen health
+      bind :8888
+      mode http
+      monitor-uri /healthz
+      option      dontlognull
+
+    frontend frontend_redis
+      bind *:6379
+      use_backend redis_cluster
+
+    backend redis_cluster
+      mode tcp
+      option tcp-check
+      tcp-check connect
+      {{- if .Values.redis.auth.enabled }}
+      tcp-check send "AUTH $REDIS_PASSWORD"\r\n
+      tcp-check expect string +OK
+      {{- end }}
+      tcp-check send PING\r\n
+      tcp-check expect string +PONG
+      tcp-check send info\ replication\r\n
+      tcp-check expect string role:master
+      tcp-check send QUIT\r\n
+      tcp-check expect string +OK
+      {{- $replicas := int (toString .Values.redis.replica.replicaCount) }}
+      {{- range $i := until $replicas }}
+      server R{{ $i }} {{ $fullName }}-node-{{ $i }}:6379 check inter {{ $.Values.haproxy.check.interval }} fall {{ $.Values.haproxy.check.fall }} rise {{ $.Values.haproxy.check.rise }}
+      {{- end }}

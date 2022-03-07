@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "common.names.fullname" . }}-haproxy
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: haproxy
+spec:
+  replicas: {{ .Values.haproxy.replicaCount }}
+  {{- if .Values.haproxy.updateStrategy }}
+  strategy: {{- toYaml .Values.haproxy.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: haproxy
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/haproxy-configmap.yaml") . | sha256sum }}
+        {{- with .Values.haproxy.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        app.kubernetes.io/component: haproxy
+    spec:
+      {{- include "redis-ha.imagePullSecrets" . | indent 6 }}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "redis-ha.serviceAccountName" . }}-haproxy
+      {{- end }}
+      {{- if .Values.haproxy.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.haproxy.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: haproxy
+        image: {{ template "redis-ha.haproxyImage" . }}
+        imagePullPolicy: {{ .Values.haproxy.image.pullPolicy }}
+        {{- if .Values.haproxy.containerSecurityContext.enabled }}
+        securityContext: {{- omit .Values.haproxy.containerSecurityContext "enabled" | toYaml | nindent 10 }}
+        {{- end }}
+        env:
+        {{- if .Values.redis.auth.enabled }}
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "common.subchart.tpl" (list . "redis" "redis.secretName") }}
+              key: {{ template "common.subchart.tpl" (list . "redis" "redis.secretPasswordKey") }}
+        {{- end }}
+        ports:
+        - name: redis
+          containerPort: 6379
+        {{- if .Values.haproxy.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8888
+          initialDelaySeconds: {{ .Values.haproxy.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.haproxy.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.haproxy.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.haproxy.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.haproxy.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.haproxy.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8888
+          initialDelaySeconds: {{ .Values.haproxy.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.haproxy.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.haproxy.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.haproxy.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.haproxy.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.haproxy.resources | nindent 10 }}
+        volumeMounts:
+        - name: haproxy-conf
+          mountPath: /bitnami/haproxy/conf
+      volumes:
+      - name: haproxy-conf
+        configMap:
+          name: {{ template "common.names.fullname"  . }}-haproxy
+      {{- if .Values.haproxy.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.haproxy.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.haproxy.podAffinityPreset "component" "haproxy" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.haproxy.podAntiAffinityPreset "component" "haproxy" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.haproxy.nodeAffinityPreset.type "key" .Values.haproxy.nodeAffinityPreset.key "values" .Values.haproxy.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.haproxy.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.haproxy.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.haproxy.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.haproxy.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.haproxy.spreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.haproxy.spreadConstraints "context" $) | nindent 8 }}
+      {{- end }}

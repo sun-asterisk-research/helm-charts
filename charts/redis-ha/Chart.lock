@@ -1,0 +1,9 @@
+dependencies:
+- name: common
+  repository: https://sun-asterisk-research.github.io/helm-charts
+  version: 0.2.0
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 15.3.1
+digest: sha256:f5addc0bc11fc0153b401959add19db86f984a8871dc85d47d21fb0feb1a3ebf
+generated: "2022-03-08T04:08:48.60055449+07:00"

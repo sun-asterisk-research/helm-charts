@@ -1,0 +1,25 @@
+{{- $redisFullName := include "common.subchart.tpl" (list . "redis" "common.names.fullname") -}}
+{{- $replicas := int (toString .Values.redis.replica.replicaCount) }}
+{{- range $i := until $replicas }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" $ }}-node-{{ $i }}
+  labels:
+    {{- include "common.labels.standard" $ | nindent 4 }}
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: ClusterIP
+  publishNotReadyAddresses: true
+  ports:
+  - port: 6379
+    targetPort: {{ $.Values.redis.replica.containerPort }}
+    protocol: TCP
+    name: redis
+  selector:
+    {{- include "common.subchart.tpl" (list $ "redis" "common.labels.matchLabels") | nindent 4 }}
+    app.kubernetes.io/component: node
+    statefulset.kubernetes.io/pod-name: {{ $redisFullName }}-node-{{ $i }}
+{{- end }}
