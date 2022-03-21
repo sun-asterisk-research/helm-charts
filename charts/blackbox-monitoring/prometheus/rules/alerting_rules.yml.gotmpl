@@ -1,0 +1,25 @@
+groups:
+- name: blackbox-monitoring-alerts
+  rules:
+  {{- if .Values.alerting.rules.endpointDown.enabled }}
+  - alert: {{ .Values.alerting.rules.endpointDown.name }}
+    expr: sum by (instance) (probe_success{}) == 0
+    for: {{ .Values.alerting.rules.endpointDown.for }}
+    labels:
+      severity: {{ .Values.alerting.rules.endpointDown.severity }}
+    annotations:
+      summary: ":fire: {{`{{ $labels.instance }}`}} is down!"
+  {{- end }}
+  {{- if .Values.alerting.rules.endpointDown.enabled }}
+  - alert: {{ .Values.alerting.rules.apdexLow.name }}
+    expr: |
+      (
+        (count_over_time(job:probe_duration_seconds:satisfied[1h]) or on() 0 * count_over_time(probe_duration_seconds[1h]))
+        + ((count_over_time(job:probe_duration_seconds:tolerating[1h]) or on() 0 * count_over_time(probe_duration_seconds[1h])) / 2)
+      ) / count_over_time(probe_duration_seconds[1h]) < {{ .Values.alerting.rules.apdexLow.threshold }}
+    for: {{ .Values.alerting.rules.apdexLow.for }}
+    labels:
+      severity: {{ .Values.alerting.rules.apdexLow.severity }}
+    annotations:
+      summary: "Apdex score for {{`{{ $labels.instance }}`}} is lower than {{ .Values.alerting.rules.apdexLow.threshold }}"
+  {{- end }}

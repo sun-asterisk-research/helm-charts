@@ -1,0 +1,116 @@
+imagePullSecrets: []
+
+nameOverride: ""
+
+fullnameOverride: ""
+
+commonAnnotations:
+
+targets: []
+# - name: My Site
+#   url: https://example.com
+
+defaults:
+  scrapeInterval: 30s
+  scrapeTimeout: 30s
+
+apdex:
+  T: 1
+
+alerting:
+  enabled: false
+  rules:
+    endpointDown:
+      enabled: true
+      name: EndpointDown
+      severity: critical
+      for: 30s
+    apdexLow:
+      enabled: true
+      name: ApdexLow
+      severity: warning
+      threshold: 0.85
+      for: 5m
+  receivers:
+    slack:
+      enabled: false
+      api_url:
+      channel:
+      title: "[{{ .Status }}] {{ .CommonLabels.alertname }}"
+      text: |-
+        {{ range .Alerts }}
+          *Severity:* {{ .Labels.severity }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *StartAt:* {{ .StartsAt }}
+        {{ end }}
+      send_resolved: true
+    webhook:
+      enabled: false
+      url:
+      max_alerts: 1
+      send_resolved: true
+
+alertmanagerConfig:
+  global:
+    resolve_timeout: 5m
+  route:
+    group_by: ['alertname']
+    group_interval: 1m
+    group_wait: 30s
+    repeat_interval: 30m
+
+prometheus:
+  enabled: true
+
+  server:
+    retention: 30d
+    configMapOverrideName: prometheus
+    service:
+      servicePort: 9090
+
+  alertmanager:
+    enabled: true
+    configMapOverrideName: alertmanager
+    service:
+      servicePort: 9093
+
+  kubeStateMetrics:
+    enabled: false
+  nodeExporter:
+    enabled: false
+  pushgateway:
+    enabled: false
+
+blackbox-exporter:
+  serviceMonitor:
+    enabled: false
+
+grafana:
+  enabled: true
+  plugins: ['natel-discrete-panel', 'neocat-cal-heatmap-panel']
+  grafana.ini:
+    dashboards:
+      default_home_dashboard_path: /tmp/dashboards/status.json
+    users:
+      default_theme: light
+  sidecar:
+    dashboards:
+      enabled: true
+      provider:
+        name: kubernetes
+        disableDelete: true
+      label: grafana.com/dashboard-for
+      labelValue: blackbox-monitoring
+    datasources:
+      enabled: true
+      label: grafana.com/datasource-for
+      labelValue: blackbox-monitoring
+  testFramework:
+    enabled: false
+
+externalPrometheus:
+  url:
+  auth:
+    username:
+    password:

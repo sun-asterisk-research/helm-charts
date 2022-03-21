@@ -1,0 +1,15 @@
+dependencies:
+- name: common
+  repository: https://sun-asterisk-research.github.io/helm-charts
+  version: 0.2.0
+- name: prometheus
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 15.5.3
+- name: prometheus-blackbox-exporter
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 5.4.1
+- name: grafana
+  repository: https://grafana.github.io/helm-charts
+  version: 6.24.0
+digest: sha256:53655f91a21192c3b37e776261fe993593549710837c51e1f97c55811a11f699
+generated: "2022-03-14T01:53:33.823330326+07:00"

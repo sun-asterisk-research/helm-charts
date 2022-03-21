@@ -1,0 +1,9 @@
+groups:
+- name: blackbox-monitoring
+  rules:
+  - record: job:probe_duration_seconds:satisfied
+    expr: probe_duration_seconds <= {{ .Values.apdex.T }}
+  - record: job:probe_duration_seconds:tolerating
+    expr: probe_duration_seconds > {{ .Values.apdex.T }} <= {{ mul .Values.apdex.T 4 }}
+  - record: job:probe_duration_seconds:frustrated
+    expr: probe_duration_seconds > {{ mul .Values.apdex.T 4 }}

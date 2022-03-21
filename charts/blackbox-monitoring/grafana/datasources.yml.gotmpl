@@ -1,0 +1,15 @@
+apiVersion: 1
+
+datasources:
+- name: Prometheus
+  type: prometheus
+  access: proxy
+  isDefault: 1
+  orgId: 1
+  url: {{ include "blackbox-monitoring.prometheus.url" . }}
+  editable: false
+  {{- if eq (include "blackbox-monitoring.prometheus.auth.enabled" .) "true" }}
+  basicAuth: true
+  basicAuthUser: {{ include "blackbox-monitoring.prometheus.auth.user" . }}
+  basicAuthPassword: {{ include "blackbox-monitoring.prometheus.auth.password" . }}
+  {{- end }}

@@ -1,0 +1,22 @@
+global:
+  {{- .Values.alertmanagerConfig.global | toYaml | nindent 2 }}
+
+receivers:
+- name: default
+  {{- if .Values.alerting.receivers.webhook.enabled }}
+  webhook_configs:
+  - url: {{ .Values.alerting.receivers.webhook.url | required "`alerts.receivers.webhook.url` is required" }}
+    {{- omit .Values.alerting.receivers.slack "enabled" "url" | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if .Values.alerting.receivers.slack.enabled }}
+  slack_configs:
+  - api_url: {{ .Values.alerting.receivers.slack.api_url | required "`alerts.receivers.slack.api_url` is required" }}
+    channel: {{ .Values.alerting.receivers.slack.channel | required "`alerts.receivers.slack.channel` is required" }}
+    {{- omit .Values.alerting.receivers.slack "enabled" "api_url" "channel" | toYaml | nindent 4 }}
+  {{- end }}
+
+route:
+  receiver: default
+  routes:
+  - receiver: default
+    {{- omit .Values.alertmanagerConfig.route "routes" | toYaml | nindent 4 }}
