@@ -10,6 +10,33 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/beanstalkd-0.1.0/beanstalkd-0.1.0.tgz
     version: 0.1.0
+  blackbox-monitoring:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2022-04-04T08:37:03.178923611Z"
+    dependencies:
+    - name: common
+      repository: https://sun-asterisk-research.github.io/helm-charts
+      version: 0.2.0
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 15.5.3
+    - alias: blackbox-exporter
+      name: prometheus-blackbox-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.4.1
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 6.24.0
+    description: Blackbox monitoring with Prometheus, Alertmanager and Grafana
+    digest: d49ae29f42b7eb916fa0887fdccd5fd87bdfe7fba269c39b716d8808f118bbd4
+    name: blackbox-monitoring
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/blackbox-monitoring-0.1.0/blackbox-monitoring-0.1.0.tgz
+    version: 0.1.0
   cert-manager-issuer:
   - apiVersion: v2
     created: "2022-03-07T21:27:29.639765607Z"
@@ -221,4 +248,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/service-account-1.0.0/service-account-1.0.0.tgz
     version: 1.0.0
-generated: "2022-03-07T21:27:31.183776738Z"
+generated: "2022-04-04T08:37:03.178936611Z"
