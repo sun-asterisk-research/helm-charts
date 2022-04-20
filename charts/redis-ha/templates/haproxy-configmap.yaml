@@ -19,6 +19,12 @@ data:
       monitor-uri /healthz
       option      dontlognull
 
+    listen stats
+      bind :32700
+      mode http
+      stats enable
+      stats uri /
+
     frontend frontend_redis
       bind *:6379
       use_backend redis_cluster
