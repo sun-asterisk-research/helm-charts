@@ -2,8 +2,8 @@ apiVersion: v2
 name: db-init
 description: Init script to create multiple databases and users for MySQL/MariaDB and PostgreSQL
 type: application
-version: 0.1.1
+version: 0.2.0
 dependencies:
 - name: common
-  version: 1.4.2
+  version: 1.13.0
   repository: https://charts.bitnami.com/bitnami
