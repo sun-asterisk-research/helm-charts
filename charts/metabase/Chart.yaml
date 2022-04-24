@@ -2,8 +2,8 @@ apiVersion: v2
 name: metabase
 description: The simplest, fastest way to get business intelligence and analytics to everyone in your company.
 type: application
-version: 0.1.3
-appVersion: v0.42.2
+version: 0.1.4
+appVersion: v0.42.4
 dependencies:
 - name: common
   version: 1.11.1
