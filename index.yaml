@@ -83,6 +83,20 @@ entries:
     version: 0.2.0
   db-init:
   - apiVersion: v2
+    created: "2022-04-24T11:53:49.309094689Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.13.0
+    description: Init script to create multiple databases and users for MySQL/MariaDB
+      and PostgreSQL
+    digest: dd14ab70f6d60a6f9d8de737f0d57bff3e38857fe87de930fcc07337a314bec5
+    name: db-init
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/db-init-0.2.0/db-init-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2022-03-07T21:27:29.915566009Z"
     dependencies:
     - name: common
@@ -158,6 +172,21 @@ entries:
     version: 2.1.1
   metabase:
   - apiVersion: v2
+    appVersion: v0.42.4
+    created: "2022-04-24T11:53:49.440647469Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.11.1
+    description: The simplest, fastest way to get business intelligence and analytics
+      to everyone in your company.
+    digest: 991b8fab91a6e05362f4d540e8c9b707f6c0711d428b7e585a69a766f939e904
+    name: metabase
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/metabase-0.1.4/metabase-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
     appVersion: v0.42.2
     created: "2022-03-07T21:27:30.608363786Z"
     dependencies:
@@ -204,6 +233,23 @@ entries:
   redis-ha:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2022-04-24T11:53:49.570592123Z"
+    dependencies:
+    - name: common
+      repository: https://sun-asterisk-research.github.io/helm-charts
+      version: 0.2.0
+    - name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.3.1
+    description: A Helm chart for Kubernetes
+    digest: b836b9c88c127393c144fa36365bc90f368ba2298f0ab6760f2019ef7d50b06e
+    name: redis-ha
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/redis-ha-0.2.0/redis-ha-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2022-03-07T21:27:30.89890478Z"
     dependencies:
     - name: common
@@ -248,4 +294,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/service-account-1.0.0/service-account-1.0.0.tgz
     version: 1.0.0
-generated: "2022-04-04T08:37:03.178936611Z"
+generated: "2022-04-24T11:53:49.570610723Z"
