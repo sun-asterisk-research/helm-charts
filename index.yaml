@@ -230,6 +230,20 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/openedx-0.1.0/openedx-0.1.0.tgz
     version: 0.1.0
+  rbac:
+  - apiVersion: v2
+    created: "2022-06-02T06:12:55.148742294Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.11.3
+    description: Service account to enable access from automated systems
+    digest: a33141640b801af50e4638fc2de5b2e379c941d28d1e12078c014654b00518d6
+    name: rbac
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/rbac-1.0.0/rbac-1.0.0.tgz
+    version: 1.0.0
   redis-ha:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -294,4 +308,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/service-account-1.0.0/service-account-1.0.0.tgz
     version: 1.0.0
-generated: "2022-04-24T11:53:49.570610723Z"
+generated: "2022-06-02T06:12:55.148763594Z"
