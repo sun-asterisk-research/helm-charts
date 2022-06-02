@@ -1,5 +1,5 @@
 apiVersion: v2
-name: service-account
+name: rbac
 description: Service account to enable access from automated systems
 type: application
 version: 1.0.0

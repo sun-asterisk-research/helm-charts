@@ -5,6 +5,9 @@ serviceAccount:
   name: ""
   annotations: {}
 
+roleBinding:
+  kind: RoleBinding
+
 role:
   kind: Role
   rules: []

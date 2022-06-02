@@ -38,12 +38,10 @@ A service account for deploying from automated system (e.g. CI/CD).
 - apiGroups:
   - apps
   - autoscaling
-  - cert-manager.io
   - extensions
   - networking.k8s.io
   - rbac.authorization.k8s.io
   - batch/v1beta1
-  - monitoring.coreos.com
   resources:
   - '*'
   verbs:
