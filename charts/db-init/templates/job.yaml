@@ -8,7 +8,6 @@ metadata:
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
   annotations:
-    checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     checksum/init-db-script: {{ include (print $.Template.BasePath "/init-db-script.yaml") . | sha256sum }}
     checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     {{- if .Values.commonAnnotations }}
@@ -61,9 +60,10 @@ spec:
           if [[ $? -eq 0 ]]; then
             echo "[InitDB] Script finished successfully."
           fi
+        env:
+        - name: DEBUG
+          value: {{ .Values.debug | quote }}
         envFrom:
-        - configMapRef:
-            name: {{ template "common.names.fullname" . }}
         - secretRef:
             name: {{ template "common.names.fullname" . }}
         volumeMounts:

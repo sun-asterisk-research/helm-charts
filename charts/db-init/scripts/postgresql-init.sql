@@ -22,11 +22,7 @@ CREATE EXTENSION IF NOT EXISTS dblink;
 /* Create database {{ $db }} */
 DO $$
 BEGIN
-    {{- if empty $spec.owner }}
-    PERFORM dblink_exec('password={{ $.Values.postgresql.postgresPassword }}', 'CREATE DATABASE {{ $db }}');
-    {{- else }}
-    PERFORM dblink_exec('password={{ $.Values.postgresql.postgresPassword }}', 'CREATE DATABASE {{ $db }} OWNER {{ $spec.owner }}');
-    {{- end }}
+    PERFORM dblink_exec('dbname={{ $.Values.postgresql.database }} user={{ $.Values.postgresql.username }} password={{ $.Values.postgresql.password }}', 'CREATE DATABASE {{ $db }}{{ if not (empty $spec.owner) }} OWNER {{ $spec.owner }}{{ end }}');
 EXCEPTION WHEN DUPLICATE_DATABASE THEN
     RAISE NOTICE 'Database {{ $db }} already exists, skipping';
 END

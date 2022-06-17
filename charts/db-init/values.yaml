@@ -10,6 +10,8 @@ image:
   pullPolicy: IfNotPresent
   pullSecrets: []
 
+debug: false
+
 dbType: mysql
 
 mysql:
@@ -18,8 +20,8 @@ mysql:
     tag: 10.6.7-debian-10-r63
   host: localhost
   port: 3306
-  rootUser: root
-  rootPassword: ""
+  username: root
+  password: ""
 
 postgresql:
   image:
@@ -27,7 +29,9 @@ postgresql:
     tag: 14.2.0-debian-10-r73
   host: localhost
   port: 5432
-  postgresPassword: ""
+  database: postgres
+  username: postgres
+  password: ""
 
 users: []
 # - username:
