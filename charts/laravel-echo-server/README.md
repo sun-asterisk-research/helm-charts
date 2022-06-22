@@ -83,7 +83,6 @@ The following tables lists the configurable parameters and their default values.
 | Parameter             | Description                           | Default |
 |-----------------------|---------------------------------------|---------|
 | `ingress.enabled`     | Enable ingress controller resource    | `false` |
-| `ingress.certManager` | Add annotations for cert-manager      | `false` |
 | `ingress.hosts`       | Hosts config for the ingress resource | `[]`    |
 | `ingress.tls`         | Create TLS Secret                     | `false` |
 | `ingress.annotations` | Ingress annotations                   | `{}`    |

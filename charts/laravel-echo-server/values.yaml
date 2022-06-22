@@ -76,12 +76,16 @@ readinessProbe:
 
 ingress:
   enabled: false
-  certManager: false
+  annotations: {}
+  ingressClassName:
   hosts: []
   # - host: 'example.com'
-  #   paths: ['/socket.io']
+  #   paths:
+  #   - path: '/socket.io'
   tls: []
-  annotations: {}
+  # - hosts:
+  #   - example.com
+  #   secretName: example.com-tls
 
 resources: {}
   # limits:

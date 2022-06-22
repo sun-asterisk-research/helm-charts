@@ -2,7 +2,7 @@ apiVersion: v2
 name: laravel-echo-server
 description: Laravel Echo server
 type: application
-version: 2.1.1
+version: 3.0.0
 appVersion: 1.6.2
 dependencies:
 - name: common
