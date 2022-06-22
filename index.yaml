@@ -172,6 +172,20 @@ entries:
   laravel-echo-server:
   - apiVersion: v2
     appVersion: 1.6.2
+    created: "2022-06-22T08:47:06.350730807Z"
+    dependencies:
+    - name: common
+      repository: https://sun-asterisk-research.github.io/helm-charts
+      version: 0.2.0
+    description: Laravel Echo server
+    digest: d267cb7329d824afa36f35eba7cbb91a1493ce001ed8ed52650e3d88ae7fb141
+    name: laravel-echo-server
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/laravel-echo-server-3.0.0/laravel-echo-server-3.0.0.tgz
+    version: 3.0.0
+  - apiVersion: v2
+    appVersion: 1.6.2
     created: "2022-03-07T21:27:30.466212809Z"
     dependencies:
     - name: common
@@ -337,4 +351,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/service-account-1.0.0/service-account-1.0.0.tgz
     version: 1.0.0
-generated: "2022-06-17T04:35:20.752069751Z"
+generated: "2022-06-22T08:47:06.350752808Z"
