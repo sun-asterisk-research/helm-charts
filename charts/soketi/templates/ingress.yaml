@@ -12,7 +12,7 @@ metadata:
   {{- end }}
   {{- if and .Values.ingress.ingressClassName (eq "false" (include "common.ingress.supportsIngressClassname" .)) }}
     kubernetes.io/ingress.class: {{ .Values.ingress.ingressClassName | quote }}
-    {{- end }}
+  {{- end }}
   {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}

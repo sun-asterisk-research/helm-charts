@@ -1,9 +1,13 @@
 {{- range .Values.users }}
-/* Create user {{ .username }} */
-CREATE USER IF NOT EXISTS '{{ .username | required "A username is required" }}';
-{{ if or .password (.forcePassword | default false) -}}
-ALTER USER '{{ .username }}'@'%' IDENTIFIED BY '{{ .password | default (randAlphaNum 10) }}';
-{{ end -}}
+{{- $username := .username | required "A username is required" -}}
+/* Create user {{ $username }} */
+{{- if or .password (.forcePassword | default false) }}
+{{- $password := .password | default (randAlphaNum 10)  }}
+CREATE USER IF NOT EXISTS '{{ $username }}' IDENTIFIED WITH {{ $.Values.mysql.authPlugin }} BY '{{ $password }}';
+ALTER USER '{{ .username }}'@'%' IDENTIFIED WITH {{ $.Values.mysql.authPlugin }} BY '{{ $password }}';
+{{ else -}}
+CREATE USER IF NOT EXISTS '{{ $username }}';
+{{ end }}
 {{ end -}}
 
 {{- range $db, $roles := .Values.databases }}

@@ -56,13 +56,19 @@ spec:
           done
 
           echo "[InitDB] $DB_HOST:$DB_PORT is reachable, running init db scripts."
-          {{ .Files.Get (printf "scripts/%s-init.sh" .Values.dbType) | nindent 10 }}
+          {{ tpl (.Files.Get (printf "scripts/%s-init.sh" .Values.dbType)) . | nindent 10 }}
           if [[ $? -eq 0 ]]; then
             echo "[InitDB] Script finished successfully."
           fi
         env:
         - name: DEBUG
           value: {{ .Values.debug | quote }}
+        - name: SSL_MODE
+          value: {{ index .Values .Values.dbType "sslMode" | quote }}
+        {{- range $name, $value := .Values.extraEnvVars }}
+        - name: {{ $name }}
+          value: {{ $value | quote }}
+        {{- end }}
         envFrom:
         - secretRef:
             name: {{ template "common.names.fullname" . }}

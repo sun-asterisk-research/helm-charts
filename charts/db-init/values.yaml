@@ -16,12 +16,14 @@ dbType: mysql
 
 mysql:
   image:
-    repository: bitnami/mariadb
-    tag: 10.6.7-debian-10-r63
+    repository: bitnami/mysql
+    tag: 8.0.30-debian-11-r7
   host: localhost
   port: 3306
   username: root
   password: ""
+  sslMode: preferred
+  authPlugin: mysql_native_password
 
 postgresql:
   image:
@@ -32,6 +34,11 @@ postgresql:
   database: postgres
   username: postgres
   password: ""
+  sslMode: prefer
+
+extraArgs: []
+
+extraEnvVars: []
 
 users: []
 # - username:
