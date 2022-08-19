@@ -97,6 +97,20 @@ entries:
     version: 0.2.0
   db-init:
   - apiVersion: v2
+    created: "2022-08-19T09:08:07.021408128Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 1.13.0
+    description: Init script to create multiple databases and users for MySQL/MariaDB
+      and PostgreSQL
+    digest: 82743bd333d64b2e5b6704441f859d507a3489ded15fe71fa3195f30cebd3fd8
+    name: db-init
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/db-init-1.2.0/db-init-1.2.0.tgz
+    version: 1.2.0
+  - apiVersion: v2
     created: "2022-08-12T11:28:42.565047166Z"
     dependencies:
     - name: common
@@ -417,4 +431,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2022-08-13T19:52:15.680568637Z"
+generated: "2022-08-19T09:08:07.021453033Z"
