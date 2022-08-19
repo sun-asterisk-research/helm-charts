@@ -16,30 +16,31 @@ ALTER USER {{ .username }} WITH ENCRYPTED PASSWORD '{{ .password | default (rand
 
 {{ if not (empty .Values.databases) -}}
 /* Prepare databases */
-CREATE EXTENSION IF NOT EXISTS dblink;
-{{- range $db, $spec := .Values.databases }}
-
+{{ range $db, $spec := .Values.databases -}}
+{{ $owner := $spec.owner -}}
 /* Create database {{ $db }} */
-DO $$
+DO
+$$
 BEGIN
-    PERFORM dblink_exec('dbname={{ $.Values.postgresql.database }} user={{ $.Values.postgresql.username }} password={{ $.Values.postgresql.password }}', 'CREATE DATABASE {{ $db }}{{ if not (empty $spec.owner) }} OWNER {{ $spec.owner }}{{ end }}');
-EXCEPTION WHEN DUPLICATE_DATABASE THEN
-    RAISE NOTICE 'Database {{ $db }} already exists, skipping';
+    IF EXISTS (SELECT FROM pg_database WHERE datname = '{{ $db }}') THEN
+        RAISE NOTICE 'Database {{ $db }} already exists, skipping';
+    END IF;
 END
 $$;
-{{- end }}
 
-DROP EXTENSION dblink;
+GRANT {{ $spec.owner }} TO {{ $.Values.postgresql.username }};
+SELECT 'CREATE DATABASE {{ $db }} OWNER {{ $spec.owner }}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ $db }}'); \gexec
+{{ end -}}
 {{ end -}}
 
-{{ range $db, $spec := .Values.databases }}
+{{ range $db, $spec := .Values.databases -}}
 /* Create roles for {{ $db }} and grant privileges */
-\c {{ $db }}
 
 {{ $owner := $spec.owner -}}
 {{ $readonly := printf "%s_readonly" $db -}}
 {{ $readwrite := printf "%s_readwrite" $db -}}
 
+\c {{ $db }}
 DO $$
 BEGIN
     /* Create {{ $readonly }} role */
@@ -102,6 +103,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE {{ . }} IN SCHEMA public GRANT EXECUTE ON FUNC
 {{- range $spec.extensions }}
 CREATE EXTENSION IF NOT EXISTS {{ . }};
 {{- end }}
-{{ end }}
-\c postgres
+{{ end -}}
+REVOKE {{ $spec.owner }} FROM {{ $.Values.postgresql.username }};
+\c {{ $.Values.postgresql.database }}
 {{ end -}}
