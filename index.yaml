@@ -410,6 +410,28 @@ entries:
     version: 1.0.0
   soketi:
   - apiVersion: v2
+    appVersion: 1.4.0
+    created: "2022-09-09T07:35:54.135620686Z"
+    dependencies:
+    - name: common
+      repository: https://sun-asterisk-research.github.io/helm-charts
+      version: 1.0.0
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 16.13.1
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.6.12
+    description: Just another simple, fast, and resilient open-source WebSockets server.
+    digest: e36a2ddcfa69f32d3c929bedf1afbac9425deddf94a1141dd3633b6fb9424037
+    name: soketi
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.2.0/soketi-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 1.2.0
     created: "2022-07-05T10:11:25.358965579Z"
     dependencies:
@@ -431,4 +453,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2022-08-19T09:08:07.021453033Z"
+generated: "2022-09-09T07:35:54.135735788Z"
