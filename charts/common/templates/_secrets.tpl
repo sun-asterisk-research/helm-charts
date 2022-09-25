@@ -1,5 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
-
 {{/*
 Render the docker config.json file containing registry login credentials
 

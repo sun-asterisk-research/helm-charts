@@ -1,5 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
-
 {{/*
 Call a template from the context of a subchart.
 

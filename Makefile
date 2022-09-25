@@ -31,6 +31,11 @@ else
 	done
 endif
 
+docs:
+	@for chart in $(CHARTS); do \
+		readme-generator -v charts/$$chart/values.yaml -r charts/$$chart/README.md \
+	; done
+
 package:
 ifeq "$(CHARTS)" "*"
 	helm package charts/* -u -d .deploy
@@ -50,7 +55,7 @@ ifeq "$(CHARTS)" "*"
 		helm cm-push $(auth_str) $(force) $$chart $(REPO); \
 	done
 else
-	@for chart in $(CHARTS); do \
+	for chart in $(CHARTS); do \
 		test "$(skipdeps)" || helm dep build "charts/$$chart"; \
 		helm cm-push $(auth_str) $(force) "charts/$$chart" $(REPO); \
 	done
