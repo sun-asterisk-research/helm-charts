@@ -14,16 +14,23 @@ spec:
   replicas: {{ .Values.replicaCount }}
   template:
     metadata:
+      labels:
+        {{- include "common.labels.standard" . | nindent 8 }}
+        {{- if .Values.podLabels }}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
       annotations:
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-      {{- with .Values.podAnnotations }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-      labels:
-        {{- include "common.labels.standard" . | nindent 8 }}
+        {{- end }}
     spec:
+      serviceAccountName: {{ include "metabase.serviceAccountName" . }}
       {{- include "metabase.imagePullSecrets" . | indent 6 }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
       containers:
       - name: metabase
         image: {{ template "metabase.image" . }}
@@ -61,6 +68,9 @@ spec:
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
+        {{- if .Values.containerSecurityContext.enabled }}
+        securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+        {{- end }}
         {{- if eq .Values.database.type "h2" }}
         volumeMounts:
         - name: data
@@ -92,4 +102,7 @@ spec:
       {{- end }}
       {{- if .Values.tolerations }}
       tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}

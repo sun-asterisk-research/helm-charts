@@ -6,102 +6,139 @@
 
 ```sh
 helm repo add sunasteriskrnd https://sun-asterisk-research.github.io/helm-charts
-helm install my-release sunasteriskrnd/metabase
+helm install metabase sunasteriskrnd/metabase
 ```
 
-## Configuration parameters
-
-The following tables lists the configurable parameters and their default values.
+## Parameters
 
 ### Global parameters
 
-| Parameter                 | Description                                     | Default |
-|---------------------------|-------------------------------------------------|---------|
-| `global.imageRegistry`    | Global Docker image registry                    | `nil`   |
-| `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`    |
+| Name                      | Description               | Value |
+| ------------------------- | ------------------------- | ----- |
+| `global.imagePullSecrets` | Global image pull secrets | `[]`  |
+
+
+### Common parameters
+
+| Name                | Description                                          | Value               |
+| ------------------- | ---------------------------------------------------- | ------------------- |
+| `nameOverride`      | String to partially override `common.names.fullname` | `""`                |
+| `fullnameOverride`  | String to fully override `common.names.fullname`     | `""`                |
+| `image.registry`    | Image registry                                       | `docker.io`         |
+| `image.repository`  | Image repository                                     | `metabase/metabase` |
+| `image.tag`         | Image tag (default to `.Chart.AppVersion`)           | `""`                |
+| `image.pullPolicy`  | Image pull policy                                    | `IfNotPresent`      |
+| `image.pullSecrets` | Image pull secrets                                   | `[]`                |
+
 
 ### Deployment parameters
 
-| Parameter                                 | Description                                                                                                                         | Default              |
-|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|----------------------|
-| `nameOverride`                            | String to partially override `common.names.fullname` template with a string (will prepend the release name)                         | `""`                 |
-| `fullnameOverride`                        | String to fully override `common.names.fullname` template with a string                                                             | `""`                 |
-| `image.registry`                          | The image registry to be used                                                                                                       | `docker.io`          |
-| `image.repository`                        | The image repository to be used                                                                                                     | `metabase/metabase`  |
-| `image.tag`                               | The image tag to be used                                                                                                            | `{METABASE_VERSION}` |
-| `image.pullPolicy`                        | Image pull policy                                                                                                                   | `IfNotPresent`       |
-| `image.pullSecrets`                       | Specify docker-registry secret names as an array                                                                                    | `[]`                 |
-| `replicaCount`                            | Number of Pods to run                                                                                                               | `1`                  |
-| `updateStrategy`                          | Set up update strategy                                                                                                              | `RollingUpdate`      |
-| `podSecurityContext`                      | Specify security context for pods                                                                                                   | `{}`                 |
-| `securityContext`                         | Specify security context for Metabase container                                                                                     | `{}`                 |
-| `encryptionKey`                           | The key used to encrypt database credentials stored in the application database                                                     | `nil`                |
-| `adminEmail`                              | The email address users should be referred to if they encounter a problem                                                           | `nil`                |
-| `database.type`                           | Possible values are `h2`, `postgresql` and `mysql`                                                                                  | `h2`                 |
-| `database.host`                           | The host name or IP address of the application database, only used when db type is not `h2`                                         | `localhost`          |
-| `database.port`                           | The port for `database.host`                                                                                                        | `nil`                |
-| `database.dbName`                         | The database name of the application database used with `database.host`                                                             | `nil`                |
-| `database.username`                       | The username for `database.host`                                                                                                    | `nil`                |
-| `database.password`                       | The password for `database.host`                                                                                                    | `nil`                |
-| `dw.maxConnectionPoolSize`                | Maximum number of connections to a data warehouse                                                                                   | `15`                 |
-| `googleSignIn.clientID`                   | Client ID for Google Auth SSO                                                                                                       | `nil`                |
-| `googleSignIn.autoCreateAccountForDomain` | Allows users to automatically create their Metabase account by logging in if their Google account email address is from this domain | `nil`                |
-| `passwordComplexity`                      | Password strength. Possible values are `weak`, `normal`, `strong`                                                                   | `normal`             |
-| `passwordLength`                          | Minimum password length                                                                                                             | `6`                  |
-| `mail.from`                               | Address you want to use as the sender of emails generated by Metabase, such as pulses or account invitations                        | `nil`                |
-| `mail.smtp.host`                          | The address of the SMTP server that handles your emails                                                                             | `nil`                |
-| `mail.smtp.port`                          | The port your SMTP server uses for outgoing emails                                                                                  | `587`                |
-| `mail.smtp.username`                      |                                                                                                                                     | `nil`                |
-| `mail.smtp.password`                      | SMTP password                                                                                                                       | `nil`                |
-| `mail.smtp.encryption`                    | SMTP secure connection protocol (`tls`, `ssl`, `starttls`, `none`)                                                                  | `none`               |
-| `site.name`                               | The name used for this instance of Metabase                                                                                         | `Metabase`           |
-| `site.url`                                | The base URL where users access Metabase, useful when serving in a sub path                                                         | `nil`                |
-| `site.locale`                             | The default language for this Metabase instance (for emails, Pulses, etc.)                                                          | `en`                 |
-| `jetty.host`                              | Hostname or IP address to listen on                                                                                                 | `0.0.0.0`            |
-| `jetty.port`                              | Port to listen on                                                                                                                   | `3000`               |
-| `jetty.maxThreads`                        | Maximum number of threads for jetty                                                                                                 | `50`                 |
-| `jetty.minThreads`                        | Minimum number of threads for jetty                                                                                                 | `8`                  |
-| `telemetry`                               | Enable the collection of anonymous usage data                                                                                       | `false`              |
-| `timezone`                                | Application timezone                                                                                                                | `UTC`                |
-| `javaOpts`                                | JVM arguments                                                                                                                       | `nil`                |
-| `resources.limits`                        | The resources limits for the container                                                                                              | `{}`                 |
-| `resources.requests`                      | The requested resources for the container                                                                                           | `{}`                 |
-| `podAnnotations`                          | Pod annotations                                                                                                                     | `{}`                 |
-| `podAffinityPreset`                       | Pod affinity preset. Allowed values: `soft` or `hard`                                                                               | `""`                 |
-| `podAntiAffinityPreset`                   | Pod anti-affinity preset. Allowed values: `soft` or `hard`                                                                          | `soft`               |
-| `nodeAffinityPreset.type`                 | Node affinity preset. Allowed values: `soft` or `hard`                                                                              | `""`                 |
-| `nodeAffinityPreset.key`                  | Node label key to match                                                                                                             | `""`                 |
-| `nodeAffinityPreset.values`               | Node label values to match                                                                                                          | `[]`                 |
-| `nodeSelector`                            | Node labels for pod assignment                                                                                                      | `{}`                 |
-| `tolerations`                             | Tolerations for pod assignment                                                                                                      | `[]`                 |
-| `affinity`                                | Affinity for pod assignment                                                                                                         | `{}`                 |
-| `livenessProbe.enabled`                   | Enable/disable the liveness probe                                                                                                   | `true`               |
-| `livenessProbe.initialDelaySeconds`       | Delay before liveness probe is initiated                                                                                            | `120`                |
-| `livenessProbe.periodSeconds`             | How often to perform the probe                                                                                                      | `10`                 |
-| `livenessProbe.timeoutSeconds`            | When the probe times out                                                                                                            | `5`                  |
-| `livenessProbe.successThreshold`          | Minimum consecutive successes for the probe to be considered successful after having failed                                         | `1`                  |
-| `livenessProbe.failureThreshold`          | Minimum consecutive failures for the probe to be considered failed after having succeeded                                           | `5`                  |
-| `readinessProbe.enabled`                  | Enable/disable the readiness probe                                                                                                  | `true`               |
-| `readinessProbe.initialDelaySeconds`      | Delay before readiness probe is initiated                                                                                           | `30`                 |
-| `readinessProbe.periodSeconds`            | How often to perform the probe                                                                                                      | `10`                 |
-| `readinessProbe.timeoutSeconds`           | When the probe times out                                                                                                            | `5`                  |
-| `readinessProbe.successThreshold`         | Minimum consecutive successes for the probe to be considered successful after having failed                                         | `1`                  |
-| `readinessProbe.failureThreshold`         | Minimum consecutive failures for the probe to be considered failed after having succeeded                                           | `5`                  |
-| `service.type`                            | Kubernetes Service type                                                                                                             | `ClusterIP`          |
-| `service.port`                            | Service HTTP port                                                                                                                   | `80`                 |
-| `persistence.enabled`                     | Enable persistence using PVC (only when `db.type` is `h2`)                                                                          | `false`              |
-| `persistence.annotations`                 | Annotations for the PVC                                                                                                             | `{}`                 |
-| `persistence.hostPath`                    | Host path to use as volume instead of PVC                                                                                           | `nil`                |
-| `persistence.storageClass`                | PVC Storage Class                                                                                                                   | `nil`                |
-| `persistence.accessModes`                 | PVC Access Modes                                                                                                                    | `[]`                 |
-| `persistence.size`                        | PVC Storage Request                                                                                                                 | `1Gi`                |
+| Name                                 | Description                                                                               | Value   |
+| ------------------------------------ | ----------------------------------------------------------------------------------------- | ------- |
+| `replicaCount`                       | Number of deployment replicas                                                             | `1`     |
+| `livenessProbe.enabled`              | Enable livenessProbe                                                                      | `true`  |
+| `livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                                                   | `120`   |
+| `livenessProbe.periodSeconds`        | Period seconds for livenessProbe                                                          | `10`    |
+| `livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                                                         | `5`     |
+| `livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                                                       | `5`     |
+| `livenessProbe.successThreshold`     | Success threshold for livenessProbe                                                       | `1`     |
+| `readinessProbe.enabled`             | Enable readinessProbe                                                                     | `true`  |
+| `readinessProbe.initialDelaySeconds` | Initial delay seconds for readinessProbe                                                  | `30`    |
+| `readinessProbe.periodSeconds`       | Period seconds for readinessProbe                                                         | `10`    |
+| `readinessProbe.timeoutSeconds`      | Timeout seconds for readinessProbe                                                        | `5`     |
+| `readinessProbe.failureThreshold`    | Failure threshold for readinessProbe                                                      | `5`     |
+| `readinessProbe.successThreshold`    | Success threshold for readinessProbe                                                      | `1`     |
+| `resources.limits`                   | Resource limits for containers                                                            | `{}`    |
+| `resources.requests`                 | Resource requests for containers                                                          | `{}`    |
+| `podLabels`                          | Extra labels for pod                                                                      | `{}`    |
+| `podAnnotations`                     | Annotations for pod                                                                       | `{}`    |
+| `podSecurityContext.enabled`         | Enable pod SecurityContext                                                                | `false` |
+| `containerSecurityContext.enabled`   | Enable container SecurityContext                                                          | `false` |
+| `podAffinityPreset`                  | Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`       | `""`    |
+| `podAntiAffinityPreset`              | Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`  | `soft`  |
+| `nodeAffinityPreset.type`            | Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard` | `""`    |
+| `nodeAffinityPreset.key`             | Node label key to match. Ignored if `affinity` is set                                     | `""`    |
+| `nodeAffinityPreset.values`          | Node label values to match. Ignored if `affinity` is set                                  | `[]`    |
+| `affinity`                           | Affinity for pod assignment. Evaluated as a template.                                     | `{}`    |
+| `nodeSelector`                       | Node labels for pod assignment. Evaluated as a template.                                  | `{}`    |
+| `tolerations`                        | Tolerations for pod assignment. Evaluated as a template.                                  | `[]`    |
+| `topologySpreadConstraints`          | Topology Spread Constraints for pod assignment. Evaluated as a template                   | `[]`    |
 
-### Ingress parameters
 
-| Parameter             | Description                           | Default |
-|-----------------------|---------------------------------------|---------|
-| `ingress.enabled`     | Enable ingress controller resource    | `false` |
-| `ingress.certManager` | Add annotations for cert-manager      | `false` |
-| `ingress.hosts`       | Hosts config for the ingress resource | `[]`    |
-| `ingress.tls`         | Create TLS Secret                     | `false` |
-| `ingress.annotations` | Ingress annotations                   | `{}`    |
+### Metabase configuration parameters
+
+| Name                                      | Description                                                                                                                                    | Value       |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `site.name`                               | The name used for this instance of Metabase                                                                                                    | `Metabase`  |
+| `site.url`                                | The base URL where users access Metabase                                                                                                       | `""`        |
+| `site.locale`                             | The default language for this Metabase instance                                                                                                | `en`        |
+| `encryptionKey`                           | When set, this will encrypt database credentials stored in the application database. Requirement: minimum 16 characters base64-encoded string. | `""`        |
+| `adminEmail`                              | The email address users should be referred to if they encounter a problem                                                                      | `""`        |
+| `database.type`                           | Database type (`h2`, `postgres` or `mysql`)                                                                                                    | `h2`        |
+| `database.host`                           | The host name or IP address of the application database (when `database.type` is not `h2`)                                                     | `localhost` |
+| `database.port`                           | The port for `database.host`                                                                                                                   | `""`        |
+| `database.dbname`                         | The database name of the application database used with `database.host`                                                                        | `""`        |
+| `database.username`                       | The username for `database.host`                                                                                                               | `""`        |
+| `database.password`                       | The password for `database.host`                                                                                                               | `""`        |
+| `database.maxConnectionPoolSize`          | Maximum number of connections to the Metabase application database                                                                             | `15`        |
+| `dataWarehouse.maxConnectionPoolSize`     | Maximum number of connections to the data source databases (for each database)                                                                 | `15`        |
+| `googleSignIn.clientID`                   | Client ID for Google Auth SSO. If this is set, Google Auth is considered to be enabled                                                         | `""`        |
+| `googleSignIn.autoCreateAccountForDomain` | When set, allows users to automatically create their Metabase account by logging in if their Google account email address is from this domain  | `""`        |
+| `passwordComplexity`                      | Enforce a password complexity rule to increase security for regular logins (`weak`, `normal` or `strong`)                                      | `normal`    |
+| `passwordLength`                          | Set a minimum password length to increase security for regular logins                                                                          | `6`         |
+| `mail.from.address`                       | Address you want to use as the sender of emails generated by Metabase, such as pulses or account invitations                                   | `""`        |
+| `mail.from.name`                          | Use the defined name in emails                                                                                                                 | `""`        |
+| `mail.replyTo`                            | Include a Reply-To address in emails                                                                                                           | `""`        |
+| `mail.smtp.host`                          | The address of the SMTP server that handles your emails                                                                                        | `""`        |
+| `mail.smtp.port`                          | The port your SMTP server uses for outgoing emails                                                                                             | `587`       |
+| `mail.smtp.username`                      | SMTP username                                                                                                                                  | `""`        |
+| `mail.smtp.password`                      | SMTP password                                                                                                                                  | `""`        |
+| `mail.smtp.encryption`                    | SMTP secure connection protocol (`tls`, `ssl`, `starttls`, `none`)                                                                             | `none`      |
+| `jetty.host`                              | Configure a host either as a host name or IP address to identify a specific network interface on which to listen                               | `0.0.0.0`   |
+| `jetty.port`                              | Configure which port to use for HTTP                                                                                                           | `3000`      |
+| `jetty.maxThreads`                        | Maximum number of threads                                                                                                                      | `50`        |
+| `jetty.minThreads`                        | Minimum number of threads                                                                                                                      | `8`         |
+| `telemetry`                               | Enable the collection of anonymous usage data in order to help Metabase improve                                                                | `false`     |
+| `timezone`                                | Connection timezone to use when executing queries. Defaults to system timezone                                                                 | `UTC`       |
+| `javaOpts`                                | `JAVA_OPTS` environment variable                                                                                                               | `""`        |
+| `extraEnvVars`                            | Extra environment variables for containers                                                                                                     | `{}`        |
+
+
+### Traffic exposure parameters
+
+| Name                               | Description                                                                   | Value       |
+| ---------------------------------- | ----------------------------------------------------------------------------- | ----------- |
+| `service.annotations`              | Service annotations                                                           | `[]`        |
+| `service.type`                     | Kubernetes Service type                                                       | `ClusterIP` |
+| `service.port`                     | Kubernetes Service port                                                       | `80`        |
+| `service.nodePort`                 | NodePort if Service type is `LoadBalancer` or `NodePort`                      | `""`        |
+| `service.externalTrafficPolicy`    | Whether to route external traffic to node-local or cluster-wide endpoints     | `Cluster`   |
+| `service.clusterIP`                | Service Cluster IP                                                            | `""`        |
+| `service.loadBalancerSourceRanges` | Limit which client IP's can access the Network Load Balancer                  | `[]`        |
+| `ingress.enabled`                  | Enable ingress resource generation                                            | `false`     |
+| `ingress.annotations`              | Additional annotations for the Ingress resource                               | `{}`        |
+| `ingress.ingressClassName`         | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+) | `nil`       |
+| `ingress.hosts`                    | Ingress hosts                                                                 | `[]`        |
+| `ingress.tls`                      | Ingress tls hosts                                                             | `[]`        |
+
+
+### Persistence parameter
+
+| Name                       | Description                                     | Value               |
+| -------------------------- | ----------------------------------------------- | ------------------- |
+| `persistence.enabled`      | Enable persistence, only when using h2 database | `false`             |
+| `persistence.annotations`  | Additional custom annotations for the PVC       | `{}`                |
+| `persistence.storageClass` | Persistent Volume storage class                 | `""`                |
+| `persistence.accessModes`  | Persistent Volume access modes                  | `["ReadWriteOnce"]` |
+| `persistence.size`         | Persistent Volume size                          | `1Gi`               |
+
+
+### ServiceAccount parameters
+
+| Name                                          | Description                                               | Value   |
+| --------------------------------------------- | --------------------------------------------------------- | ------- |
+| `serviceAccount.create`                       | Enable creation of ServiceAccount                         | `false` |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                    | `""`    |
+| `serviceAccount.annotations`                  | Annotations for service account. Evaluated as a template. | `{}`    |
+| `serviceAccount.automountServiceAccountToken` | Whether to auto mount the service account token           | `true`  |
+

@@ -1,4 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
 {{/*
 Returns the metabase image
 */}}
@@ -12,4 +11,12 @@ Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "metabase.imagePullSecrets" -}}
 {{- include "common.images.pullSecrets" (dict "images" (list .Values.image) "global" .Values.global) -}}
+{{- end -}}
+
+{{- define "metabase.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{- default (include "common.names.fullname" .) .Values.serviceAccount.name -}}
+{{- else -}}
+    {{- default "default" .Values.serviceAccount.name -}}
+{{- end -}}
 {{- end -}}

@@ -15,7 +15,8 @@ data:
   MB_DB_PORT: {{ .Values.database.port | quote }}
   MB_DB_DBNAME: {{ .Values.database.dbname | quote }}
   {{- end }}
-  MB_APPLICATION_DB_MAX_CONNECTION_POOL_SIZE: {{ .Values.dw.maxConnectionPoolSize | quote }}
+  MB_APPLICATION_DB_MAX_CONNECTION_POOL_SIZE: {{ .Values.database.maxConnectionPoolSize | quote }}
+  MB_JDBC_DATA_WAREHOUSE_MAX_CONNECTION_POOL_SIZE: {{ .Values.dataWarehouse.maxConnectionPoolSize | quote }}
   MB_PASSWORD_COMPLEXITY: {{ .Values.passwordComplexity | quote }}
   MB_PASSWORD_LENGTH: {{ .Values.passwordLength | quote }}
   MB_JETTY_HOST: {{ .Values.jetty.host | quote }}
@@ -26,7 +27,8 @@ data:
   MB_EMAIL_SMTP_HOST: {{ .Values.mail.smtp.host | quote }}
   MB_EMAIL_SMTP_PORT: {{ .Values.mail.smtp.port | quote }}
   MB_EMAIL_SMTP_SECURITY: {{ .Values.mail.smtp.encryption | quote }}
-  MB_EMAIL_FROM_ADDRESS: {{ .Values.mail.from | quote }}
+  MB_EMAIL_FROM_ADDRESS: {{ .Values.mail.from.address | quote }}
+  MB_EMAIL_FROM_NAME: {{ .Values.mail.from.name | quote }}
   MB_GOOGLE_AUTH_CLIENT_ID: {{ .Values.googleSignIn.clientID | quote }}
   MB_GOOGLE_AUTH_AUTO_CREATE_ACCOUNTS_DOMAIN: {{ .Values.googleSignIn.autoCreateAccountForDomain | quote }}
   MB_ANON_TRACKING_ENABLED: {{ .Values.telemetry | quote }}

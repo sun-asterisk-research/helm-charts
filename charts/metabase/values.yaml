@@ -1,72 +1,46 @@
-replicaCount: 1
+## @section Global parameters
+##
+global:
+  ## @param global.imagePullSecrets Global image pull secrets
+  ##
+  imagePullSecrets: []
 
+## @section Common parameters
+##
+## @param nameOverride String to partially override `common.names.fullname`
+##
+nameOverride: ""
+
+## @param fullnameOverride String to fully override `common.names.fullname`
+##
+fullnameOverride: ""
+
+## @param image.registry Image registry
+## @param image.repository Image repository
+## @param image.tag Image tag (default to `.Chart.AppVersion`)
+## @param image.pullPolicy Image pull policy
+## @param image.pullSecrets Image pull secrets
+##
 image:
   registry: docker.io
   repository: metabase/metabase
-  tag:
-  command: []
+  tag: ""
   pullPolicy: IfNotPresent
+  pullSecrets: []
 
-imagePullSecrets: []
+## @section Deployment parameters
 
-nameOverride: ""
+## @param replicaCount Number of deployment replicas
+##
+replicaCount: 1
 
-fullnameOverride: ""
-
-site:
-  name: Metabase
-  url: ""
-  locale: en
-
-encryptionKey: ""
-
-adminEmail: ""
-
-# Backend database
-database:
-  # Available values are h2, mysql and postgres
-  type: h2
-  host: localhost
-  port: ""
-  dbname: ""
-  username: ""
-  password: ""
-
-dw:
-  maxConnectionPoolSize: 15
-
-googleSignIn:
-  clientID: ""
-  autoCreateAccountForDomain: ""
-
-passwordLength: 6
-# Available values are
-# weak: no constraint
-# normal: at least 1 digit (default)
-# strong: minimum 8 characters with at least 2 lowercases, 2 uppercases, 1 digit, and 1 special character
-passwordComplexity: normal
-
-mail:
-  from: ""
-  smtp:
-    host: ""
-    port: 587
-    username: ""
-    password: ""
-    encryption: none
-
-jetty:
-  host: "0.0.0.0"
-  port: 3000
-  maxThreads: 50
-  minThreads: 8
-
-telemetry: false
-
-timezone: UTC
-
-javaOpts: ""
-
+## @param livenessProbe.enabled Enable livenessProbe
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
+##
 livenessProbe:
   enabled: true
   initialDelaySeconds: 120
@@ -75,6 +49,13 @@ livenessProbe:
   successThreshold: 1
   failureThreshold: 5
 
+## @param readinessProbe.enabled Enable readinessProbe
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
+##
 readinessProbe:
   enabled: true
   initialDelaySeconds: 30
@@ -83,56 +64,234 @@ readinessProbe:
   successThreshold: 1
   failureThreshold: 5
 
-service:
-  type: ClusterIP
-  port: 80
-  nodePort: ""
-  annotations: {}
+## @param resources.limits Resource limits for containers
+## @param resources.requests Resource requests for containers
+##
+resources:
+  limits: {}
+  requests: {}
 
-ingress:
-  enabled: false
-  ingressClassName:
-  host: metabase.local
-  # The ingress path. Useful to host metabase on a subpath, such as `/metabase`.
-  path: /
-  pathType: ImplementationSpecific
-  annotations: {}
-  tls: false
-  certManager: false
+## @param podLabels Extra labels for pod
+##
+podLabels: {}
 
-resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 200m
-  #   memory: 256Mi
-
+## @param podAnnotations Annotations for pod
+##
 podAnnotations: {}
 
+## @param podSecurityContext.enabled Enable pod SecurityContext
+##
 podSecurityContext:
   enabled: false
 
+## @param containerSecurityContext.enabled Enable container SecurityContext
+##
+containerSecurityContext:
+  enabled: false
+
+## @param podAffinityPreset Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`
+##
 podAffinityPreset: ""
 
+## @param podAntiAffinityPreset Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`
+##
 podAntiAffinityPreset: soft
 
+## @param nodeAffinityPreset.type Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard`
+## @param nodeAffinityPreset.key Node label key to match. Ignored if `affinity` is set
+## @param nodeAffinityPreset.values Node label values to match. Ignored if `affinity` is set
+##
 nodeAffinityPreset:
   type: ""
   key: ""
   values: []
 
-nodeSelector: {}
-
-tolerations: []
-
+## @param affinity Affinity for pod assignment. Evaluated as a template.
+##
 affinity: {}
 
-# Whether to enable persistence, only when using h2 database
+## @param nodeSelector  Node labels for pod assignment. Evaluated as a template.
+##
+nodeSelector: {}
+
+## @param tolerations Tolerations for pod assignment. Evaluated as a template.
+##
+tolerations: []
+
+## @param topologySpreadConstraints Topology Spread Constraints for pod assignment. Evaluated as a template
+##
+topologySpreadConstraints: []
+
+## @section Metabase configuration parameters
+##
+
+## @param site.name The name used for this instance of Metabase
+## @param site.url The base URL where users access Metabase
+## @param site.locale The default language for this Metabase instance
+site:
+  name: Metabase
+  url: ""
+  locale: en
+
+## @param encryptionKey When set, this will encrypt database credentials stored in the application database. Requirement: minimum 16 characters base64-encoded string.
+##
+encryptionKey: ""
+
+## @param adminEmail The email address users should be referred to if they encounter a problem
+##
+adminEmail: ""
+
+## @param database.type Database type (`h2`, `postgres` or `mysql`)
+## @param database.host The host name or IP address of the application database (when `database.type` is not `h2`)
+## @param database.port The port for `database.host`
+## @param database.dbname The database name of the application database used with `database.host`
+## @param database.username The username for `database.host`
+## @param database.password The password for `database.host`
+## @param database.maxConnectionPoolSize Maximum number of connections to the Metabase application database
+##
+database:
+  type: h2
+  host: localhost
+  port: ""
+  dbname: ""
+  username: ""
+  password: ""
+  maxConnectionPoolSize: 15
+
+## @param dataWarehouse.maxConnectionPoolSize Maximum number of connections to the data source databases (for each database)
+##
+dataWarehouse:
+  maxConnectionPoolSize: 15
+
+## @param googleSignIn.clientID Client ID for Google Auth SSO. If this is set, Google Auth is considered to be enabled
+## @param googleSignIn.autoCreateAccountForDomain When set, allows users to automatically create their Metabase account by logging in if their Google account email address is from this domain
+##
+googleSignIn:
+  clientID: ""
+  autoCreateAccountForDomain: ""
+
+## @param passwordComplexity Enforce a password complexity rule to increase security for regular logins (`weak`, `normal` or `strong`)
+## weak: no constraint
+## normal: at least 1 digit (default)
+## strong: minimum 8 characters with at least 2 lowercases, 2 uppercases, 1 digit, and 1 special character
+##
+passwordComplexity: normal
+
+## @param passwordLength Set a minimum password length to increase security for regular logins
+##
+passwordLength: 6
+
+## @param mail.from.address Address you want to use as the sender of emails generated by Metabase, such as pulses or account invitations
+## @param mail.from.name Use the defined name in emails
+## @param mail.replyTo Include a Reply-To address in emails
+## @param mail.smtp.host The address of the SMTP server that handles your emails
+## @param mail.smtp.port The port your SMTP server uses for outgoing emails
+## @param mail.smtp.username SMTP username
+## @param mail.smtp.password SMTP password
+## @param mail.smtp.encryption SMTP secure connection protocol (`tls`, `ssl`, `starttls`, `none`)
+##
+mail:
+  from:
+    address: ""
+    name: ""
+  replyTo: ""
+  smtp:
+    host: ""
+    port: 587
+    username: ""
+    password: ""
+    encryption: none
+
+## @param jetty.host Configure a host either as a host name or IP address to identify a specific network interface on which to listen
+## @param jetty.port Configure which port to use for HTTP
+## @param jetty.maxThreads Maximum number of threads
+## @param jetty.minThreads Minimum number of threads
+##
+jetty:
+  host: "0.0.0.0"
+  port: 3000
+  maxThreads: 50
+  minThreads: 8
+
+## @param telemetry Enable the collection of anonymous usage data in order to help Metabase improve
+##
+telemetry: false
+
+## @param timezone Connection timezone to use when executing queries. Defaults to system timezone
+##
+timezone: UTC
+
+## @param javaOpts `JAVA_OPTS` environment variable
+##
+javaOpts: ""
+
+## @param extraEnvVars Extra environment variables for containers
+##
+extraEnvVars: {}
+
+## @section Traffic exposure parameters
+##
+## @param service.annotations Service annotations
+## @param service.type Kubernetes Service type
+## @param service.port Kubernetes Service port
+## @param service.nodePort NodePort if Service type is `LoadBalancer` or `NodePort`
+## @param service.externalTrafficPolicy Whether to route external traffic to node-local or cluster-wide endpoints
+## @param service.clusterIP Service Cluster IP
+## @param service.loadBalancerSourceRanges Limit which client IP's can access the Network Load Balancer
+##
+service:
+  annotations: []
+  type: ClusterIP
+  port: 80
+  nodePort: ""
+  externalTrafficPolicy: Cluster
+  clusterIP: ""
+  loadBalancerSourceRanges: []
+
+## @param ingress.enabled Enable ingress resource generation
+## @param ingress.annotations Additional annotations for the Ingress resource
+## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+## @param ingress.hosts Ingress hosts
+## @param ingress.tls Ingress tls hosts
+##
+ingress:
+  enabled: false
+  annotations: {}
+  ingressClassName:
+  hosts: []
+  # - host: 'example.com'
+  #   paths:
+  #   - path: '/socket.io'
+  tls: []
+  # - hosts:
+  #   - example.com
+  #   secretName: example.com-tls
+
+## @section Persistence parameter
+##
+## @param persistence.enabled Enable persistence, only when using h2 database
+## @param persistence.annotations Additional custom annotations for the PVC
+## @param persistence.storageClass Persistent Volume storage class
+## @param persistence.accessModes Persistent Volume access modes
+## @param persistence.size Persistent Volume size
+##
 persistence:
   enabled: false
   annotations: {}
-  hostPath:
-  storageClass:
-  accessModes: []
+  storageClass: ""
+  accessModes:
+  - ReadWriteOnce
   size: 1Gi
+
+## @section ServiceAccount parameters
+##
+## @param serviceAccount.create Enable creation of ServiceAccount
+## @param serviceAccount.name The name of the ServiceAccount to use.
+## @param serviceAccount.annotations Annotations for service account. Evaluated as a template.
+## @param serviceAccount.automountServiceAccountToken Whether to auto mount the service account token
+##
+serviceAccount:
+  create: false
+  name: ""
+  annotations: {}
+  automountServiceAccountToken: true
