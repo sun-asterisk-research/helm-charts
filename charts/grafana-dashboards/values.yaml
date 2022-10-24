@@ -1,22 +1,39 @@
+## @section Common parameters
+##
+## @param nameOverride String to partially override `common.names.fullname`
+##
 nameOverride: ""
+
+## @param fullnameOverride String to fully override `common.names.fullname`
+##
 fullnameOverride: ""
 
-# Common labels and annotations
+## @param commonLabels Additional labels for dashboards
+##
 commonLabels: {}
+
+## @param commonAnnotations Additional annotations for dashboards
+##
 commonAnnotations: {}
 
-# Dashboards included by default
+## @section Dashboards parameters
+##
+## @param defaultDashboards Dashboards included by default
+##
 defaultDashboards:
 - nodes
+- kube-resources
 
-# Whether to include default dashboards when extra dashboards is set
+## @param includeDefaultDashboards Whether to include default dashboards when extra dashboards is set
+##
 includeDefaultDashboards: true
 
-# Extra dashboards to include
+## @param dashboards Extra dashboards to include
 dashboards: []
 # - kube-resources
 # - nginx-ingress-controller
 # - nginx-ingress-requests
 
-# Annotation to put folder name on, used for dashboards provisioning
+## @param folderAnnotation Annotation to put folder name on, can be used for dashboards provisioning
+##
 folderAnnotation:

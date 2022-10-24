@@ -6,7 +6,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: monitoring-grafana-dashboard-{{ $basename }}
+  name: {{ include "common.names.fullname" $ }}-{{ $basename }}
   labels:
     {{- include "common.labels.standard" $ | nindent 4 }}
     {{- if $.Values.commonLabels }}

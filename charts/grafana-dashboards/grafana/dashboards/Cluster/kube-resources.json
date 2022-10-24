@@ -16,8 +16,7 @@
   "editable": true,
   "gnetId": 9871,
   "graphTooltip": 0,
-  "id": 4,
-  "iteration": 1620758824575,
+  "iteration": 1666470599145,
   "links": [],
   "panels": [
     {
@@ -84,7 +83,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_allocatable_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"})",
+          "expr": "sum(kube_node_status_allocatable{resource=\"cpu\", node=~\"$node\"})",
           "interval": "",
           "legendFormat": "Allocatable",
           "queryType": "randomWalk",
@@ -92,7 +91,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_requests_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"})",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", node!=\"\", node=~\"$node\"})",
           "hide": false,
           "interval": "",
           "legendFormat": "Requested",
@@ -100,7 +99,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_limits_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"})",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"cpu\", node!=\"\", node=~\"$node\"})",
           "hide": false,
           "interval": "",
           "legendFormat": "Limit",
@@ -108,7 +107,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_usage_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"})",
+          "expr": "sum(irate(container_cpu_usage_seconds_total{node=~\"$node\", name!=\"\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Usage",
@@ -160,7 +159,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": "Prometheus",
+      "datasource": "-- Dashboard --",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -213,9 +212,9 @@
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "mean"
+            "last"
           ],
-          "fields": "",
+          "fields": "/^Usage / Allocatable$/",
           "values": false
         },
         "showThresholdLabels": false,
@@ -225,20 +224,35 @@
       "pluginVersion": "7.5.5",
       "targets": [
         {
-          "exemplar": true,
-          "expr": "sum(eagle_node_resource_usage_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"}) / sum(eagle_node_resource_allocatable_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"})",
-          "interval": "",
-          "legendFormat": "",
-          "queryType": "randomWalk",
+          "panelId": 2,
           "refId": "A"
         }
       ],
       "title": "CPU Usage",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "",
+            "binary": {
+              "left": "Usage",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Allocatable"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
       "type": "gauge"
     },
     {
       "cacheTimeout": null,
-      "datasource": "Prometheus",
+      "datasource": "-- Dashboard --",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -291,9 +305,9 @@
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "mean"
+            "last"
           ],
-          "fields": "",
+          "fields": "/^Usage / Allocatable$/",
           "values": false
         },
         "showThresholdLabels": false,
@@ -303,15 +317,29 @@
       "pluginVersion": "7.5.5",
       "targets": [
         {
-          "exemplar": true,
-          "expr": "sum(eagle_node_resource_usage_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"}) / sum(eagle_node_resource_allocatable_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"})",
-          "interval": "",
-          "legendFormat": "",
-          "queryType": "randomWalk",
+          "panelId": 3,
           "refId": "A"
         }
       ],
       "title": "Memory Usage",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "Usage",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Allocatable"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
       "type": "gauge"
     },
     {
@@ -364,7 +392,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_allocatable_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"})",
+          "expr": "sum(kube_node_status_allocatable{resource=\"memory\", node=~\"$node\"})",
           "interval": "",
           "legendFormat": "Allocatable",
           "queryType": "randomWalk",
@@ -372,7 +400,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_requests_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"})",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", node!=\"\", node=~\"$node\"})",
           "hide": false,
           "interval": "",
           "legendFormat": "Requested",
@@ -380,7 +408,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_limits_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"})",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", node!=\"\", node=~\"$node\"})",
           "hide": false,
           "interval": "",
           "legendFormat": "Limit",
@@ -388,7 +416,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_usage_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"})",
+          "expr": "sum(container_memory_working_set_bytes{node=~\"$node\", name!=\"\"})",
           "hide": false,
           "interval": "",
           "legendFormat": "Usage",
@@ -415,6 +443,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:38",
           "format": "decbytes",
           "label": "Memory",
           "logBase": 1,
@@ -423,6 +452,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:39",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -452,18 +482,20 @@
     },
     {
       "datasource": "Prometheus",
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
           "custom": {
-            "align": null,
+            "align": "left",
             "filterable": false
           },
           "decimals": 2,
           "displayName": "",
           "mappings": [],
+          "noValue": "0.00",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -472,8 +504,12 @@
                 "value": null
               },
               {
+                "color": "super-light-orange",
+                "value": 0.6
+              },
+              {
                 "color": "red",
-                "value": 80
+                "value": 0.8
               }
             ]
           },
@@ -483,85 +519,9 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "node"
+              "options": "Reserved"
             },
             "properties": [
-              {
-                "id": "displayName",
-                "value": "Node"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #A"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Allocatable"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #B"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Requested"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #C"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Limit"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #D"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Reserved"
-              },
               {
                 "id": "unit",
                 "value": "percentunit"
@@ -569,43 +529,15 @@
               {
                 "id": "custom.displayMode",
                 "value": "lcd-gauge"
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": null
-                    },
-                    {
-                      "color": "light-orange",
-                      "value": 0.5
-                    },
-                    {
-                      "color": "red",
-                      "value": 0.7
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Value #E"
+              "options": "Burstable"
             },
             "properties": [
-              {
-                "id": "displayName",
-                "value": "Burstable"
-              },
               {
                 "id": "unit",
                 "value": "percentunit"
@@ -647,13 +579,9 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Value #F"
+              "options": "Usage"
             },
             "properties": [
-              {
-                "id": "displayName",
-                "value": "Usage"
-              },
               {
                 "id": "unit",
                 "value": "percentunit"
@@ -661,30 +589,6 @@
               {
                 "id": "custom.displayMode",
                 "value": "lcd-gauge"
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": null
-                    },
-                    {
-                      "color": "light-orange",
-                      "value": 0.6
-                    },
-                    {
-                      "color": "red",
-                      "value": 0.8
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
               }
             ]
           }
@@ -707,7 +611,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_allocatable_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
+          "expr": "sum(kube_node_status_allocatable{resource=\"cpu\", node=~\"$node\"}) by (node)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -717,7 +621,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_requests_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", node!=\"\", node=~\"$node\"}) by (node)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -727,7 +631,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_limits_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"cpu\", node!=\"\", node=~\"$node\"}) by (node)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -737,33 +641,13 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_requests_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"} / eagle_node_resource_allocatable_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "Reserved",
-          "refId": "D"
-        },
-        {
-          "exemplar": true,
-          "expr": "sum(eagle_node_resource_limits_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"} / eagle_node_resource_allocatable_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "Burstable",
-          "refId": "E"
-        },
-        {
-          "exemplar": true,
-          "expr": "sum(eagle_node_resource_usage_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"} / eagle_node_resource_allocatable_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
+          "expr": "sum(irate(container_cpu_usage_seconds_total{node=~\"$node\", name!=\"\"}[5m])) by (node)",
           "format": "table",
           "hide": false,
           "instant": true,
           "interval": "",
           "legendFormat": "Usage",
-          "refId": "F"
+          "refId": "D"
         }
       ],
       "title": "Node CPU",
@@ -771,22 +655,6 @@
         {
           "id": "merge",
           "options": {}
-        },
-        {
-          "id": "filterFieldsByName",
-          "options": {
-            "include": {
-              "names": [
-                "node",
-                "Value #A",
-                "Value #B",
-                "Value #C",
-                "Value #D",
-                "Value #E",
-                "Value #F"
-              ]
-            }
-          }
         },
         {
           "id": "sortBy",
@@ -798,24 +666,97 @@
               }
             ]
           }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Reserved",
+            "binary": {
+              "left": "Value #B",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Value #A"
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Burstable",
+            "binary": {
+              "left": "Value #C",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Value #A"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Usage",
+            "binary": {
+              "left": "Value #D",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Value #A"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value #D": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "Value #A": "Allocatable",
+              "Value #Allocatable": "Allocatable",
+              "Value #B": "Requests",
+              "Value #C": "Limits",
+              "Value #F": "",
+              "Value #Limit": "Limit",
+              "Value #Requested": "Requested",
+              "Value #Usage": "Usage",
+              "node": "Node"
+            }
+          }
         }
       ],
       "type": "table"
     },
     {
       "datasource": "Prometheus",
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
           "custom": {
-            "align": null,
+            "align": "left",
             "filterable": false
           },
           "decimals": 2,
           "displayName": "",
           "mappings": [],
+          "noValue": "0.00",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -824,112 +765,24 @@
                 "value": null
               },
               {
+                "color": "super-light-orange",
+                "value": 0.6
+              },
+              {
                 "color": "red",
-                "value": 80
+                "value": 0.8
               }
             ]
           },
-          "unit": "short"
+          "unit": "bytes"
         },
         "overrides": [
           {
             "matcher": {
               "id": "byName",
-              "options": "node"
+              "options": "Reserved"
             },
             "properties": [
-              {
-                "id": "displayName",
-                "value": "Node"
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #A"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Allocatable"
-              },
-              {
-                "id": "unit",
-                "value": "decbytes"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #B"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Requested"
-              },
-              {
-                "id": "unit",
-                "value": "decbytes"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #C"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Limit"
-              },
-              {
-                "id": "unit",
-                "value": "decbytes"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #D"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Reserved"
-              },
               {
                 "id": "unit",
                 "value": "percentunit"
@@ -937,43 +790,15 @@
               {
                 "id": "custom.displayMode",
                 "value": "lcd-gauge"
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": null
-                    },
-                    {
-                      "color": "light-orange",
-                      "value": 0.5
-                    },
-                    {
-                      "color": "red",
-                      "value": 0.7
-                    }
-                  ]
-                }
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Value #E"
+              "options": "Burstable"
             },
             "properties": [
-              {
-                "id": "displayName",
-                "value": "Burstable"
-              },
               {
                 "id": "unit",
                 "value": "percentunit"
@@ -981,10 +806,6 @@
               {
                 "id": "custom.displayMode",
                 "value": "lcd-gauge"
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
               },
               {
                 "id": "thresholds",
@@ -1007,6 +828,10 @@
                 }
               },
               {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
                 "id": "max",
                 "value": 3
               }
@@ -1015,13 +840,9 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Value #F"
+              "options": "Usage"
             },
             "properties": [
-              {
-                "id": "displayName",
-                "value": "Usage"
-              },
               {
                 "id": "unit",
                 "value": "percentunit"
@@ -1029,30 +850,6 @@
               {
                 "id": "custom.displayMode",
                 "value": "lcd-gauge"
-              },
-              {
-                "id": "custom.align",
-                "value": "left"
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": null
-                    },
-                    {
-                      "color": "light-orange",
-                      "value": 0.6
-                    },
-                    {
-                      "color": "red",
-                      "value": 0.8
-                    }
-                  ]
-                }
               }
             ]
           }
@@ -1064,9 +861,10 @@
         "x": 0,
         "y": 18
       },
-      "id": 17,
+      "id": 25,
       "links": [],
       "options": {
+        "frameIndex": 1,
         "showHeader": true,
         "sortBy": []
       },
@@ -1074,7 +872,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_allocatable_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
+          "expr": "sum(kube_node_status_allocatable{resource=\"memory\", node=~\"$node\"}) by (node)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1084,7 +882,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_requests_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", node!=\"\", node=~\"$node\"}) by (node)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1094,7 +892,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_limits_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", node!=\"\", node=~\"$node\"}) by (node)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1104,33 +902,13 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(eagle_node_resource_requests_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"} / eagle_node_resource_allocatable_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "Reserved",
-          "refId": "D"
-        },
-        {
-          "exemplar": true,
-          "expr": "sum(eagle_node_resource_limits_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"} / eagle_node_resource_allocatable_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "Burstable",
-          "refId": "E"
-        },
-        {
-          "exemplar": true,
-          "expr": "sum(eagle_node_resource_usage_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"} / eagle_node_resource_allocatable_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (node)",
+          "expr": "sum(container_memory_working_set_bytes{node=~\"$node\", name!=\"\"}) by (node)",
           "format": "table",
           "hide": false,
           "instant": true,
           "interval": "",
           "legendFormat": "Usage",
-          "refId": "F"
+          "refId": "D"
         }
       ],
       "title": "Node Memory",
@@ -1138,22 +916,6 @@
         {
           "id": "merge",
           "options": {}
-        },
-        {
-          "id": "filterFieldsByName",
-          "options": {
-            "include": {
-              "names": [
-                "node",
-                "Value #A",
-                "Value #B",
-                "Value #C",
-                "Value #D",
-                "Value #E",
-                "Value #F"
-              ]
-            }
-          }
         },
         {
           "id": "sortBy",
@@ -1164,6 +926,77 @@
                 "field": "node"
               }
             ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Reserved",
+            "binary": {
+              "left": "Value #B",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Value #A"
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Burstable",
+            "binary": {
+              "left": "Value #C",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Value #A"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Usage",
+            "binary": {
+              "left": "Value #D",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Value #A"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value #D": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "Value #A": "Allocatable",
+              "Value #Allocatable": "Allocatable",
+              "Value #B": "Requests",
+              "Value #C": "Limits",
+              "Value #F": "",
+              "Value #Limit": "Limit",
+              "Value #Requested": "Requested",
+              "Value #Usage": "Usage",
+              "node": "Node"
+            }
           }
         }
       ],
@@ -1205,15 +1038,15 @@
       "id": 24,
       "legend": {
         "alignAsTable": true,
-        "avg": false,
-        "current": true,
+        "avg": true,
+        "current": false,
         "hideEmpty": false,
         "hideZero": false,
         "max": false,
         "min": false,
         "rightSide": true,
         "show": true,
-        "sort": "current",
+        "sort": "avg",
         "sortDesc": true,
         "total": false,
         "values": true
@@ -1236,7 +1069,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "topk(10, sum(eagle_pod_container_resource_usage_cpu_cores{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (pod))",
+          "expr": "topk(10, sum(irate(container_cpu_usage_seconds_total{node=~\"$node\", name!=\"\", pod!=\"\"}[5m])) by (pod))",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -1312,8 +1145,8 @@
       "id": 20,
       "legend": {
         "alignAsTable": true,
-        "avg": false,
-        "current": true,
+        "avg": true,
+        "current": false,
         "hideEmpty": false,
         "hideZero": false,
         "max": false,
@@ -1321,7 +1154,7 @@
         "rightSide": true,
         "show": true,
         "sideWidth": null,
-        "sort": "current",
+        "sort": "avg",
         "sortDesc": true,
         "total": false,
         "values": true
@@ -1344,7 +1177,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "topk(10, sum(eagle_pod_container_resource_usage_memory_bytes{node=~\"$node_pool.*\", node=~\"$node.*\"}) by (pod))",
+          "expr": "topk(10, sum(container_memory_working_set_bytes{node=~\"$node\", name!=\"\", pod!=\"\"}) by (pod))",
           "interval": "",
           "legendFormat": "{{ pod }}",
           "queryType": "randomWalk",
@@ -1399,38 +1232,11 @@
   "schemaVersion": 27,
   "style": "dark",
   "tags": [
-    "cluster",
-    "kubernetes",
-    "pods"
+    "resources",
+    "cluster"
   ],
   "templating": {
     "list": [
-      {
-        "allValue": ".*",
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": "$__all"
-        },
-        "description": null,
-        "error": null,
-        "hide": 0,
-        "includeAll": true,
-        "label": "Node Pool",
-        "multi": false,
-        "name": "node_pool",
-        "options": [
-          {
-            "selected": true,
-            "text": "All",
-            "value": "$__all"
-          }
-        ],
-        "query": ",",
-        "queryValue": "",
-        "skipUrlSync": false,
-        "type": "custom"
-      },
       {
         "allValue": ".*",
         "current": {
@@ -1439,7 +1245,7 @@
           "value": "$__all"
         },
         "datasource": "Prometheus",
-        "definition": "label_values(eagle_node_resource_allocatable_cpu_cores{node=~\"$node_pool.*\"}, node)",
+        "definition": "label_values(kube_node_info, node)",
         "description": null,
         "error": null,
         "hide": 0,
@@ -1449,8 +1255,8 @@
         "name": "node",
         "options": [],
         "query": {
-          "query": "label_values(eagle_node_resource_allocatable_cpu_cores{node=~\"$node_pool.*\"}, node)",
-          "refId": "Prometheus-node-Variable-Query"
+          "query": "label_values(kube_node_info, node)",
+          "refId": "StandardVariableQuery"
         },
         "refresh": 1,
         "regex": "",
@@ -1506,5 +1312,5 @@
   "timezone": "",
   "title": "Kubernetes Pods Resources Allocation & Usage",
   "uid": "resources",
-  "version": 4
+  "version": 5
 }
