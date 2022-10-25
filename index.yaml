@@ -13,6 +13,32 @@ entries:
   blackbox-monitoring:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2022-10-25T04:57:54.036744737Z"
+    dependencies:
+    - name: common
+      repository: https://sun-asterisk-research.github.io/helm-charts
+      version: 1.1.0
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 15.16.1
+    - alias: blackbox-exporter
+      name: prometheus-blackbox-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 7.1.2
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 6.43.0
+    description: Blackbox monitoring with Prometheus, Alertmanager and Grafana
+    digest: 1090290eda49883111467fc22231ee17a7f5ccb6416343de337c7ba9781ea050
+    name: blackbox-monitoring
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/blackbox-monitoring-0.1.1/blackbox-monitoring-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2022-04-04T08:37:03.178923611Z"
     dependencies:
     - name: common
@@ -496,4 +522,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2022-10-24T07:37:05.720984321Z"
+generated: "2022-10-25T04:57:54.036782637Z"
