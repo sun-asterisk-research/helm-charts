@@ -2,7 +2,7 @@
 
 {{- define "blackbox-monitoring.prometheus.url" -}}
 {{- if .Values.prometheus.enabled -}}
-{{ printf "http://%s-server" (include "common.subchart.tpl" (list . "prometheus" "prometheus.fullname")) }}:{{ .Values.prometheus.server.service.servicePort }}
+{{ printf "http://%s-server" (include "common.subchart.tpl" (dict "context" . "subchart" "prometheus" "tpl" "prometheus.fullname")) }}:{{ .Values.prometheus.server.service.servicePort }}
 {{- else -}}
 {{- printf "%s" .Values.externalPrometheus.url -}}
 {{- end -}}

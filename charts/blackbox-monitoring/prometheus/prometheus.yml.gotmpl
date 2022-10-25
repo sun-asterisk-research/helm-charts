@@ -28,7 +28,7 @@ scrape_configs:
   - action: keep
     source_labels:
     - __meta_kubernetes_service_name
-    regex: ({{ template "common.subchart.tpl" (list $ "blackbox-exporter" "prometheus-blackbox-exporter.fullname") }})
+    regex: ({{ template "common.subchart.tpl" (dict "context" $ "subchart" "blackbox-exporter" "tpl" "prometheus-blackbox-exporter.fullname") }})
   - action: keep
     source_labels:
     - __meta_kubernetes_endpoint_port_name
@@ -59,7 +59,7 @@ alerting:
     - action: keep
       source_labels:
       - __meta_kubernetes_service_name
-      regex: ({{ template "common.subchart.tpl" (list . "prometheus" "prometheus.alertmanager.fullname") }})
+      regex: ({{ template "common.subchart.tpl" (dict "context" . "subchart" "prometheus" "tpl" "prometheus.alertmanager.fullname") }})
     - action: keep
       source_labels:
       - __meta_kubernetes_endpoint_port_name

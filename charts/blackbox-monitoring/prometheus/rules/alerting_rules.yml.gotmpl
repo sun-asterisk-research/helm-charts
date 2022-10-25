@@ -1,3 +1,4 @@
+{{- if .Values.alerting.enabled -}}
 groups:
 - name: blackbox-monitoring-alerts
   rules:
@@ -23,3 +24,4 @@ groups:
     annotations:
       summary: "Apdex score for {{`{{ $labels.instance }}`}} is lower than {{ .Values.alerting.rules.apdexLow.threshold }}"
   {{- end }}
+{{- end -}}

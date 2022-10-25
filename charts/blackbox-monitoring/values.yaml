@@ -1,30 +1,66 @@
-imagePullSecrets: []
-
+## @section Common parameters
+##
+## @param nameOverride String to partially override `common.names.fullname`
+##
 nameOverride: ""
 
+## @param fullnameOverride String to fully override `common.names.fullname`
+##
 fullnameOverride: ""
 
-commonAnnotations:
+## @param commonLabels Additional labels for resources
+##
+commonLabels: {}
 
+## @param commonAnnotations Additional annotations for resources
+##
+commonAnnotations: {}
+
+## @section Monitoring parameters
+##
+## @param targets Monitoring targets
+##
 targets: []
 # - name: My Site
 #   url: https://example.com
+#   interval: 30s
+#   timeout: 5s
 
+## @param defaults.scrapeInterval Default scrape interval for targets
+## @param defaults.scrapeTimeout Default scrape timeout for targets
+##
 defaults:
   scrapeInterval: 30s
   scrapeTimeout: 30s
 
 apdex:
+  ## @param apdex.T T value for calculating apdex
+  ## See https://docs.newrelic.com/docs/apm/new-relic-apm/apdex/apdex-measure-user-satisfaction for explaination
+  ##
   T: 1
 
+
 alerting:
+  ## @param alerting.enabled Enable alerting
+  ##
   enabled: false
   rules:
+    ## @param alerting.rules.endpointDown.enabled Enable EndpointDown alert
+    ## @param alerting.rules.endpointDown.name EndpointDown alert name
+    ## @param alerting.rules.endpointDown.severity EndpointDown alert severity
+    ## @param alerting.rules.endpointDown.for Durations before EndpointDown alert is sent to receivers
+    ##
     endpointDown:
       enabled: true
       name: EndpointDown
       severity: critical
       for: 30s
+    ## @param alerting.rules.apdexLow.enabled Enable ApdexLow alert
+    ## @param alerting.rules.apdexLow.name ApdexLow alert name
+    ## @param alerting.rules.apdexLow.severity ApdexLow alert severity
+    ## @param alerting.rules.apdexLow.threshold ApdexLow alert threshold
+    ## @param alerting.rules.apdexLow.for Durations before ApdexLow alert is sent to receivers
+    ##
     apdexLow:
       enabled: true
       name: ApdexLow
@@ -32,6 +68,13 @@ alerting:
       threshold: 0.85
       for: 5m
   receivers:
+    ## @param alerting.receivers.slack.enabled Enable Slack receiver
+    ## @param alerting.receivers.slack.api_url Slack receiver API URL
+    ## @param alerting.receivers.slack.channel Slack receiver channel
+    ## @param alerting.receivers.slack.title Slack receiver alert title
+    ## @param alerting.receivers.slack.text [string] Slack receiver alert content (See values.yaml for default)
+    ## @param alerting.receivers.slack.send_resolved Whether to send resolved message to Slack receiver
+    ##
     slack:
       enabled: false
       api_url:
@@ -45,50 +88,93 @@ alerting:
           *StartAt:* {{ .StartsAt }}
         {{ end }}
       send_resolved: true
+    ## @param alerting.receivers.webhook.enabled Enable webhook receiver
+    ## @param alerting.receivers.webhook.url URL to send webhook payloads
+    ## @param alerting.receivers.webhook.max_alerts Maximum number of alerts per payload to send
+    ## @param alerting.receivers.webhook.send_resolved Whether to send resolved payload
     webhook:
       enabled: false
       url:
       max_alerts: 1
       send_resolved: true
 
+## @param alertmanagerConfig.route.group_by Labels by which alerts are grouped together
+## @param alertmanagerConfig.route.group_interval How long to wait before sending a notification about new alerts that are added to a group of alerts for which an initial notification has already been sent. (Usually ~5m or more)
+## @param alertmanagerConfig.route.group_wait How long to initially wait to send a notification for a group of alerts
+## @param alertmanagerConfig.route.repeat_interval How long to wait before sending a notification again if it has already been sent successfully for an alert
+##
 alertmanagerConfig:
-  global:
-    resolve_timeout: 5m
   route:
     group_by: ['alertname']
-    group_interval: 1m
+    group_interval: 5m
     group_wait: 30s
     repeat_interval: 30m
 
+## @section Prometheus parameters
+##
 prometheus:
+  ## @param prometheus.enabled Enable prometheus subchart
+  ##
   enabled: true
 
   server:
+    ## @param prometheus.server.retention Time to retent probe metrics
+    ##
     retention: 30d
+    ## @param prometheus.server.configMapOverrideName Override configmap name for Prometheus
+    ##
     configMapOverrideName: prometheus
+    ## @param prometheus.server.service.servicePort Prometheus service port
+    ##
     service:
       servicePort: 9090
 
   alertmanager:
+    ## @param prometheus.alertmanager.enabled Enable alertmanager
+    ##
     enabled: true
+    ## @param prometheus.alertmanager.configMapOverrideName Override configmap name for Alertmanager
+    ##
     configMapOverrideName: alertmanager
+    ## @param prometheus.alertmanager.service.servicePort Alertmanager service port
+    ##
     service:
       servicePort: 9093
 
+  ## @skip prometheus.kubeStateMetrics
+  ##
   kubeStateMetrics:
     enabled: false
+  ## @skip prometheus.nodeExporter
+  ##
   nodeExporter:
     enabled: false
+  ## @skip prometheus.pushgateway
+  ##
   pushgateway:
     enabled: false
 
+## @section Blackbox exporter parameters
+##
 blackbox-exporter:
   serviceMonitor:
+    ## @param blackbox-exporter.serviceMonitor.enabled Enable generating ServiceMonitor resource for Blackbox exporter
+    ##
     enabled: false
+  ## @param blackbox-exporter.pspEnabled Enable generation of PodSecurityPolicy resource
+  pspEnabled: false
 
+## @section Grafana parameters
+##
 grafana:
+  ## @param grafana.enabled Enable Grafana subchart
+  ##
   enabled: true
+  ## @param grafana.plugins Grafana plugins to install by default
+  ##
   plugins: ['natel-discrete-panel', 'neocat-cal-heatmap-panel']
+  ## @param grafana.grafana.ini [object] Grafana config file
+  ##
   grafana.ini:
     dashboards:
       default_home_dashboard_path: /tmp/dashboards/status.json
@@ -96,21 +182,46 @@ grafana:
       default_theme: light
   sidecar:
     dashboards:
+      ## @param grafana.sidecar.dashboards.enabled Enable dashboards watcher sidecar
+      ##
       enabled: true
+      ## @param grafana.sidecar.dashboards.provider.name Grafana dashboards provider name
+      ## @param grafana.sidecar.dashboards.provider.disableDelete Disable deletion for dashboards provisioned by the sidecar
+      ##
       provider:
         name: kubernetes
         disableDelete: true
-      label: grafana.com/dashboard-for
+      ## @param grafana.sidecar.dashboards.label ConfigMap label to watch for dashboards
+      ##
+      label: grafana/dashboard-for
+      ## @param grafana.sidecar.dashboards.labelValue ConfigMap label value to watch for dashboards
+      ##
       labelValue: blackbox-monitoring
     datasources:
+      ## @param grafana.sidecar.datasources.enabled Enable data sources watcher sidecar
+      ##
       enabled: true
-      label: grafana.com/datasource-for
+      ## @param grafana.sidecar.datasources.label ConfigMap label to watch for data sources
+      ##
+      label: grafana/datasource-for
+      ## @param grafana.sidecar.datasources.labelValue ConfigMap label value to watch for data sources
+      ##
       labelValue: blackbox-monitoring
   testFramework:
+    ## @param grafana.testFramework.enabled Enable Grafana subchart test framework
+    ##
     enabled: false
+  rbac:
+    ## @param grafana.rbac.pspEnabled Enable generation of PodSecurityPolicy resource
+    ##
+    pspEnabled: false
 
+## @section External Prometheus config (for Grafana subchart data source)
 externalPrometheus:
+  ## @param externalPrometheus.url External Prometheus URL
   url:
   auth:
+    ## @param externalPrometheus.auth.username External Prometheus auth username
     username:
+    ## @param externalPrometheus.auth.password External Prometheus auth password
     password:
