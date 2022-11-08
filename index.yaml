@@ -296,6 +296,21 @@ entries:
     version: 2.1.1
   metabase:
   - apiVersion: v2
+    appVersion: v0.44.6
+    created: "2022-11-08T03:56:47.712134678Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 2.0.3
+    description: The simplest, fastest way to get business intelligence and analytics
+      to everyone in your company.
+    digest: 74057a4086c123a898e1c68b82f9152bd3a2febf71138a61646909bb90c4b6ae
+    name: metabase
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/metabase-1.0.1/metabase-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
     appVersion: v0.44.4
     created: "2022-10-12T04:14:59.354357285Z"
     dependencies:
@@ -522,4 +537,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2022-10-25T04:57:54.036782637Z"
+generated: "2022-11-08T03:56:47.712361382Z"
