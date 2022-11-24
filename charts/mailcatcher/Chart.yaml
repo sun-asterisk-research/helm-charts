@@ -1,0 +1,9 @@
+apiVersion: v2
+name: mailcatcher
+description: A Helm chart for Mailcatcher
+version: 0.1.0
+type: application
+dependencies:
+  - name: common
+    version: 0.2.0
+    repository: https://sun-asterisk-research.github.io/helm-charts
