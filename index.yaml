@@ -296,6 +296,19 @@ entries:
     version: 2.1.1
   mailcatcher:
   - apiVersion: v2
+    created: "2022-11-24T06:24:44.401330198Z"
+    dependencies:
+    - name: common
+      repository: https://sun-asterisk-research.github.io/helm-charts
+      version: 0.2.0
+    description: A Helm chart for Mailcatcher
+    digest: 39181466b83eb40b9aeffa685dcb72061843850ee62415d4dbf540c8ae66c7a7
+    name: mailcatcher
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/mailcatcher-0.1.1/mailcatcher-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     created: "2022-11-24T04:28:02.641491826Z"
     dependencies:
     - name: common
@@ -551,4 +564,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2022-11-24T04:28:02.641533028Z"
+generated: "2022-11-24T06:24:44.4013819Z"
