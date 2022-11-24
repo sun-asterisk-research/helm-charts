@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: https://sun-asterisk-research.github.io/helm-charts
+  version: 0.2.0
+digest: sha256:e38d92949c71394d4a08bd2697ee4a9e4e770b540d9b2eb186baaff8d1cb8a88
+generated: "2022-11-24T10:19:48.338317102+07:00"
