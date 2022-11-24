@@ -294,6 +294,20 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/laravel-echo-server-2.1.1/laravel-echo-server-2.1.1.tgz
     version: 2.1.1
+  mailcatcher:
+  - apiVersion: v2
+    created: "2022-11-24T04:28:02.641491826Z"
+    dependencies:
+    - name: common
+      repository: https://sun-asterisk-research.github.io/helm-charts
+      version: 0.2.0
+    description: A Helm chart for Mailcatcher
+    digest: 93e46ef51288599f481a05070951b8e3265ba141c2e9cb93a2453918bc818ba6
+    name: mailcatcher
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/mailcatcher-0.1.0/mailcatcher-0.1.0.tgz
+    version: 0.1.0
   metabase:
   - apiVersion: v2
     appVersion: v0.44.6
@@ -537,4 +551,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2022-11-08T03:56:47.712361382Z"
+generated: "2022-11-24T04:28:02.641533028Z"
