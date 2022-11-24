@@ -35,16 +35,19 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 1080
+  http:
+    port: 1080
+  smtp:
+    port: 1025
 
 ingress:
-  enabled: true
+  enabled: false
   ingressClassName: nginx
   annotations: {}
-  hosts:
-    - host: mailcatcher.localhost
-      paths:
-        - path: /
+  hosts: []
+#    - host: mailcatcher.localhost
+#      paths:
+#        - path: /
   tls: []
 #    - secretName: chart-example-tls
 #      hosts:

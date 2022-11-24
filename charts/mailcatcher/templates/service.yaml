@@ -7,9 +7,13 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.service.http.port }}
       targetPort: http
       protocol: TCP
       name: http
+    - port: {{ .Values.service.smtp.port }}
+      targetPort: smtp
+      protocol: TCP
+      name: smtp
   selector:
     {{- include "common.labels.standard" . | nindent 4 }}

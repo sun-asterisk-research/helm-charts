@@ -1,7 +1,7 @@
 apiVersion: v2
 name: mailcatcher
 description: A Helm chart for Mailcatcher
-version: 0.1.0
+version: 0.1.1
 type: application
 dependencies:
   - name: common
