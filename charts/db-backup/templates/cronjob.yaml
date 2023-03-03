@@ -27,11 +27,21 @@ spec:
   {{- with $.Values.cronjob.successfulJobsHistoryLimit }}
   successfulJobsHistoryLimit: {{ . }}
   {{- end }}
+  {{- if $.Values.cronjob.startingDeadlineSeconds }}
+  {{- with $.Values.cronjob.startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ . }}
+  {{- end }}
+  {{- end }}
   jobTemplate:
     metadata:
       labels:
         {{- include "common.labels.standard" $ | nindent 8 }}
     spec:
+      {{- if $.Values.cronjob.activeDeadlineSeconds }}
+      {{- with $.Values.cronjob.activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ . }}
+      {{- end }}
+      {{- end }}
       backoffLimit: {{ $.Values.cronjob.jobBackoffLimit }}
       template:
         metadata:

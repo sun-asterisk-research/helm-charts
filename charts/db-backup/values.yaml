@@ -35,6 +35,8 @@ cronjob:
   concurrencyPolicy: ""
   failedJobsHistoryLimit: ""
   successfulJobsHistoryLimit: ""
+  startingDeadlineSeconds: ""
+  activeDeadlineSeconds: ""
   jobBackoffLimit: 0
   podRestartPolicy: Never
 
