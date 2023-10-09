@@ -77,6 +77,38 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/cert-manager-issuer-0.1.0/cert-manager-issuer-0.1.0.tgz
     version: 0.1.0
+  codecov:
+  - apiVersion: v2
+    appVersion: v5.0.1
+    created: "2023-10-09T10:04:27.122105013Z"
+    dependencies:
+    - name: common
+      repository: https://sun-asterisk-research.github.io/helm-charts
+      version: 1.0.0
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.0.11
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.2
+    - alias: timescaledb
+      condition: timescaledb.enabled
+      name: timescaledb-single
+      repository: https://charts.timescale.com/
+      version: 0.33.*
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.8.1
+    description: A Helm chart for Codecov
+    digest: 4640946df34e06c7164f5f76a76d2c888613a3c1727e14be5ad6d97f6690f238
+    name: codecov
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/codecov-0.1.0/codecov-0.1.0.tgz
+    version: 0.1.0
   common:
   - apiVersion: v2
     appVersion: 1.1.0
@@ -621,4 +653,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2023-02-25T18:46:20.849325731Z"
+generated: "2023-10-09T10:04:27.122164313Z"
