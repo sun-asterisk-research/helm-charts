@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "common.names.fullname" . }}-frontend
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: frontend
+  template:
+    metadata:
+      annotations:
+        {{- include "codecov.checksums.appConfig" . | nindent 8 }}
+      labels:
+        {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: frontend
+    spec:
+      serviceAccountName: {{ include "codecov.serviceAccountName" . }}
+      {{- with .Values.frontend.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: frontend
+        image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+        env:
+          - name: CODECOV_BASE_HOST
+            value: {{ .Values.config.setup.codecovHost }}
+          - name: CODECOV_API_HOST
+            value: {{ .Values.config.setup.codecovHost }}
+          - name: CODECOV_IA_HOST
+            value: {{ .Values.config.setup.codecovHost }}
+          - name: CODECOV_SCHEME
+            value: {{ .Values.config.setup.codecovScheme }}
+          {{- with .Values.extraEnvs }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+        envFrom:
+          {{- include "codecov.env" . | nindent 8 }}
+        ports:
+          - name: http
+            containerPort: {{ .Values.frontend.containerPort }}
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /frontend_health
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /frontend_health
+            port: http
+        volumeMounts:
+          {{- include "codecov.volumeMounts" . | nindent 8 }}
+          {{- with .Values.volumeMounts }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+        securityContext:
+          {{- toYaml .Values.frontend.securityContext | nindent 12 }}
+        resources:
+          {{- toYaml .Values.frontend.resources | nindent 12 }}
+      volumes:
+      {{- include "codecov.volumes" . | nindent 6 }}
+      {{- if .Values.frontend.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.frontend.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.frontend.podAffinityPreset "component" "frontend" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.frontend.podAntiAffinityPreset "component" "frontend" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" .Values.frontend.nodeAffinityPreset | nindent 10 }}
+      {{- end }}
+      {{- if .Values.frontend.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.frontend.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.frontend.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.frontend.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.frontend.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.frontend.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}

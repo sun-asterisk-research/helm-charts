@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  labels: {{ include "common.labels.standard" . | nindent 4 }}
+data:
+  SETUP__LOGLVL: DEBUG
+  SETUP__CODECOV_HOST: {{ .Values.config.setup.codecovHost }}
+  SETUP__CODECOV_SCHEME: {{ .Values.config.setup.codecovScheme }}
+  SETUP__CODECOV_URL: {{ .Values.config.setup.codecovUrl }}
+  SETUP__CODECOV_API_URL: {{ .Values.config.setup.codecovApiUrl }}
+  SETUP__TIMESERIES__ENABLED: {{ .Values.config.setup.timeseries.enabled | quote }}
+  SITE__COMMENT__LAYOUT: {{ .Values.config.site.comment.layout | quote }}
+  codecov.yml: |
+{{ .Values.config.codecovConfig | indent 4 }}

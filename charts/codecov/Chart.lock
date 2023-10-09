@@ -1,0 +1,18 @@
+dependencies:
+- name: common
+  repository: https://sun-asterisk-research.github.io/helm-charts
+  version: 1.0.0
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 17.0.11
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.1.2
+- name: timescaledb-single
+  repository: https://charts.timescale.com/
+  version: 0.33.1
+- name: minio
+  repository: https://charts.bitnami.com/bitnami
+  version: 11.8.1
+digest: sha256:af0d5e8aa30a7fd831e24b42039064ba9bded00edf3d5927abe374220b46d8fa
+generated: "2023-10-03T15:58:01.950639816+07:00"

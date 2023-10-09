@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "common.names.fullname" . }}-worker
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: worker
+  template:
+    metadata:
+      annotations:
+        {{- include "codecov.checksums.appConfig" . | nindent 8 }}
+      labels:
+        {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: worker
+    spec:
+      serviceAccountName: {{ include "codecov.serviceAccountName" . }}
+      {{- with .Values.worker.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+        args:
+          - worker
+        env:
+          - name: RUN_ENV
+            value: "ENTERPRISE"
+          {{- with .Values.extraEnvs }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+        envFrom:
+          {{- include "codecov.env" . | nindent 8 }}
+        volumeMounts:
+        - name: codecov-config
+          mountPath: "/config"
+        {{- include "codecov.volumeMounts" . | nindent 8 }}
+        {{- with .Values.volumeMounts }}
+        {{- toYaml . | nindent 12 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.worker.securityContext | nindent 12 }}
+        resources:
+          {{- toYaml .Values.worker.resources | nindent 12 }}
+      volumes:
+      - name: codecov-config
+        configMap:
+          name: {{ template "common.names.fullname" . }}
+      {{- include "codecov.volumes" . | nindent 6 }}
+      {{- if .Values.worker.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.worker.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.worker.podAffinityPreset "component" "worker" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.worker.podAntiAffinityPreset "component" "worker" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" .Values.worker.nodeAffinityPreset | nindent 10 }}
+      {{- end }}
+      {{- if .Values.worker.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.worker.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.worker.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.worker.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}

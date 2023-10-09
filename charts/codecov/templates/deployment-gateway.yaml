@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "common.names.fullname" . }}-gateway
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: gateway
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: gateway
+    spec:
+      serviceAccountName: {{ include "codecov.serviceAccountName" . }}
+      {{- with .Values.gateway.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: gateway
+        image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+        env:
+          - name: CODECOV_GATEWAY_MINIO_ENABLED
+            value: "false"
+          - name: CODECOV_API_HOST
+            value: {{ include "common.names.fullname" . }}-api-svc
+          - name: CODECOV_API_PORT
+            value: {{ .Values.api.service.port | quote }}
+          - name: CODECOV_IA_HOST
+            value: {{ include "common.names.fullname" . }}-api-svc
+          - name: CODECOV_IA_PORT
+            value: {{ .Values.api.service.port | quote }}
+          - name: CODECOV_FRONTEND_HOST
+            value: {{ include "common.names.fullname" . }}-frontend-svc
+          - name: CODECOV_FRONTEND_PORT
+            value: {{ .Values.frontend.service.port | quote }}
+          {{- if .Values.minio.enabled }}
+          - name: CODECOV_MINIO_HOST
+            value: {{ include "common.names.fullname" . }}-minio
+          - name: CODECOV_MINIO_PORT
+            value: {{ .Values.minio.service.ports.api | quote }}
+          {{- end }}
+          {{- with .Values.extraEnvs }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+        envFrom:
+          {{- include "codecov.env" . | nindent 8 }}
+        ports:
+          - name: http
+            containerPort: {{ .Values.gateway.containerPort }}
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /gateway_health
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /gateway_health
+            port: http
+        securityContext:
+          {{- toYaml .Values.gateway.securityContext | nindent 12 }}
+        resources:
+          {{- toYaml .Values.gateway.resources | nindent 12 }}
+      volumes:
+      {{- include "codecov.volumes" . | nindent 6 }}
+      {{- if .Values.gateway.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.gateway.podAffinityPreset "component" "gateway" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.gateway.podAntiAffinityPreset "component" "gateway" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" .Values.gateway.nodeAffinityPreset | nindent 10 }}
+      {{- end }}
+      {{- if .Values.gateway.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.gateway.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.gateway.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
