@@ -80,6 +80,37 @@ entries:
   codecov:
   - apiVersion: v2
     appVersion: v5.0.1
+    created: "2023-10-10T02:43:16.488167492Z"
+    dependencies:
+    - name: common
+      repository: https://sun-asterisk-research.github.io/helm-charts
+      version: 1.0.0
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.0.11
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.2
+    - alias: timescaledb
+      condition: timescaledb.enabled
+      name: timescaledb-single
+      repository: https://charts.timescale.com/
+      version: 0.33.*
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.8.1
+    description: A Helm chart for Codecov
+    digest: 237071f9d0213bb80669aa7c48bedbb87175882a93486a6bc395c083fbcd3288
+    name: codecov
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/codecov-0.1.1/codecov-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: v5.0.1
     created: "2023-10-09T10:04:27.122105013Z"
     dependencies:
     - name: common
@@ -653,4 +684,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-09T10:04:27.122164313Z"
+generated: "2023-10-10T02:43:16.488315493Z"
