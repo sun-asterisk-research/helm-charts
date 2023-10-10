@@ -2,7 +2,7 @@ apiVersion: v2
 name: codecov
 description: A Helm chart for Codecov
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "v5.0.1"
 dependencies:
 - name: common
