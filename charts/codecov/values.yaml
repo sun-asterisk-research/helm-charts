@@ -11,14 +11,14 @@ config:
     services:
       minio:
         verify_ssl: false
-        #port: 443
+        port: 443
   setup:
     codecovHost: codecov.local
     codecovScheme: https
     codecovUrl: https://codecov.local
     codecovApiUrl: https://codecov.local
     timeseries:
-      enabled: true
+      enabled: false
     enterprise_license: "very-long-license-key"
     http:
       cookie_secret: "secrets"
@@ -128,6 +128,9 @@ worker:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
+
+  args:
+  - worker
 
   imagePullSecrets: []
 
@@ -329,17 +332,16 @@ service:
 ingress:
   enabled: true
   ingressClassName: nginx
-  annotations:
-    kubernetes.io/tls-acme: "true"
+  annotations: {}
   hosts:
     - host: codecov.local
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls:
-  - secretName: codecov-tls
-    hosts:
-      - codecov.local
+  tls: []
+#  - secretName: codecov-tls
+#    hosts:
+#      - codecov.local
 
 redis:
   enabled: true

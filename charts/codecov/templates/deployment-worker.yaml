@@ -27,8 +27,7 @@ spec:
       - name: worker
         image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
-        args:
-          - worker
+        args: {{- include "common.tplvalues.render" (dict "value" .Values.worker.args "context" $) | nindent 10 }}
         env:
           - name: RUN_ENV
             value: "ENTERPRISE"
