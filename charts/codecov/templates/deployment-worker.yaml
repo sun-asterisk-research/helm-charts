@@ -32,7 +32,7 @@ spec:
           - name: RUN_ENV
             value: "ENTERPRISE"
           {{- with .Values.extraEnvs }}
-          {{- toYaml . | nindent 12 }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
         envFrom:
           {{- include "codecov.env" . | nindent 8 }}

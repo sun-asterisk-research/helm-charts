@@ -37,7 +37,7 @@ spec:
           - name: CODECOV_SCHEME
             value: {{ .Values.config.setup.codecovScheme }}
           {{- with .Values.extraEnvs }}
-          {{- toYaml . | nindent 12 }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
         envFrom:
           {{- include "codecov.env" . | nindent 8 }}
