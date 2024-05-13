@@ -11,5 +11,3 @@ data:
   SETUP__CODECOV_API_URL: {{ .Values.config.setup.codecovApiUrl }}
   SETUP__TIMESERIES__ENABLED: {{ .Values.config.setup.timeseries.enabled | quote }}
   SITE__COMMENT__LAYOUT: {{ .Values.config.site.comment.layout | quote }}
-  codecov.yml: |
-{{ .Values.config.codecovConfig | indent 4 }}

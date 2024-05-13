@@ -3,7 +3,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 config:
-  codecovConfig: |
+  codecovConfig: |-
     setup:
       admins:
         - service: github
@@ -30,7 +30,7 @@ config:
     client_secret: "secret"
     global_upload_token: "upload-token"
     webhook_secret: "secret"
-    intergration:
+    integration:
       id: 1
       pem: /home/codecov/github-app-private.key
   services:
@@ -71,16 +71,15 @@ api:
 
   podAnnotations: {}
 
-  podSecurityContext: {}
-  # fsGroup: 2000
+  podSecurityContext:
+    enabled: true
+    fsGroup: 101
 
-  securityContext: {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+  securityContext:
+    enabled: true
+    runAsNonRoot: true
+    runAsUser: 100
+    runAsGroup: 101
 
   service:
     type: ClusterIP
@@ -136,16 +135,15 @@ worker:
 
   podAnnotations: {}
 
-  podSecurityContext: {}
-  # fsGroup: 2000
+  podSecurityContext:
+    enabled: true
+    fsGroup: 101
 
-  securityContext: {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+  securityContext:
+    enabled: true
+    runAsNonRoot: true
+    runAsUser: 100
+    runAsGroup: 101
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious

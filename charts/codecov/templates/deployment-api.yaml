@@ -78,6 +78,6 @@ spec:
       {{- if .Values.api.topologySpreadConstraints }}
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.api.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
-      {{- if .Values.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- if .Values.api.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.api.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
