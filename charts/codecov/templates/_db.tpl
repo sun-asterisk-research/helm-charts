@@ -1,4 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
 {{- define "codecov.db.host" -}}
   {{- if eq .Values.postgresql.enabled true -}}
     {{- printf "%s-%s" .Release.Name "postgresql" | trunc 63 | trimSuffix "-" -}}

@@ -19,32 +19,29 @@ spec:
         app.kubernetes.io/component: frontend
     spec:
       serviceAccountName: {{ include "codecov.serviceAccountName" . }}
-      {{- with .Values.frontend.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "codecov.imagePullSecrets" . | nindent 6 }}
       containers:
-      - name: frontend
-        image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
+      - name: codecov-frontend
+        image: {{ template "codecov.images.frontend" . }}
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         env:
           - name: CODECOV_BASE_HOST
-            value: {{ .Values.config.setup.codecovHost }}
+            value: {{ include "codecov.config.host" . }}
           - name: CODECOV_API_HOST
-            value: {{ .Values.config.setup.codecovHost }}
+            value: {{ include "codecov.config.apiHost" . }}
           - name: CODECOV_IA_HOST
-            value: {{ .Values.config.setup.codecovHost }}
+            value: {{ include "codecov.config.host" . }}
           - name: CODECOV_SCHEME
-            value: {{ .Values.config.setup.codecovScheme }}
+            value: {{ include "codecov.config.scheme" . }}
           {{- with .Values.extraEnvs }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
         envFrom:
           {{- include "codecov.env" . | nindent 8 }}
         ports:
-          - name: http
-            containerPort: {{ .Values.frontend.containerPort }}
-            protocol: TCP
+        - name: http
+          containerPort: 8080
+          protocol: TCP
         livenessProbe:
           httpGet:
             path: /frontend_health
@@ -55,11 +52,9 @@ spec:
             port: http
         volumeMounts:
           {{- include "codecov.volumeMounts" . | nindent 8 }}
-          {{- with .Values.volumeMounts }}
-          {{- toYaml . | nindent 12 }}
-          {{- end }}
-        securityContext:
-          {{- toYaml .Values.frontend.securityContext | nindent 12 }}
+        {{- if .Values.frontend.containerSecurityContext.enabled }}
+        securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.frontend.containerSecurityContext "context" $) | nindent 10 }}
+        {{- end }}
         resources:
           {{- toYaml .Values.frontend.resources | nindent 12 }}
       volumes:
@@ -81,6 +76,7 @@ spec:
       {{- if .Values.frontend.topologySpreadConstraints }}
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.frontend.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
-      {{- if .Values.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- if .Values.frontend.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.frontend.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
+      enableServiceLinks: false

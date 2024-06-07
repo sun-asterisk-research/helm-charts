@@ -1,4 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
 {{- define "codecov.redis.host" -}}
   {{- if eq .Values.redis.enabled true -}}
     {{- printf "%s-%s" .Release.Name "redis" | trunc 63 | trimSuffix "-" -}}-master

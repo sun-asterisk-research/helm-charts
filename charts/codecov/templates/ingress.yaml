@@ -1,5 +1,6 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := printf "%s-gateway" (include "common.names.fullname" .) -}}
+{{- $fullName := include "common.names.fullname" . -}}
+{{- $svcName := printf "%s-gateway" $fullName -}}
 apiVersion: {{ template "common.capabilities.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
@@ -13,30 +14,36 @@ metadata:
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-    {{- with .Values.commonIngressAnnotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
 spec:
   {{- if and .Values.ingress.ingressClassName (include "common.ingress.supportsIngressClassname" .) }}
   ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
   {{- end }}
-  tls:
-  {{- range .Values.ingress.tls }}
-  - hosts:
-    {{- range .hosts }}
-    - {{ . | quote }}
-    {{- end }}
-    secretName: {{ .secretName }}
-  {{- end }}
   rules:
-  {{- range .Values.ingress.hosts }}
-  - host: {{ .host | quote }}
+  - host: {{ .Values.ingress.hostname | quote }}
     http:
       paths:
-      {{- range .paths }}
-      - path: {{ .path | default "/" }}
-        {{ template "common.ingress.pathType" (dict "context" $ "value" .pathType) }}
-        backend: {{- include "common.ingress.backend" (dict "serviceName" $fullName "servicePort" "http" "context" $) | nindent 10 }}
-      {{- end }}
+      - path: {{ .Values.ingress.path | default "/" }}
+        {{- if eq "true" (include "common.ingress.supportsPathType" .) }}
+        pathType: {{ .Values.ingress.pathType }}
+        {{- end }}
+        backend: {{- include "common.ingress.backend" (dict "serviceName" $svcName "servicePort" "http" "context" $) | nindent 10 }}
+  {{- range .Values.ingress.extraHosts }}
+  - host: {{ .name | quote }}
+    http:
+      paths:
+      - path: {{ default "/" .path }}
+        {{- if eq "true" (include "common.ingress.supportsPathType" $) }}
+        pathType: {{ default "ImplementationSpecific" .pathType }}
+        {{- end }}
+        backend: {{- include "common.ingress.backend" (dict "serviceName" $svcName "servicePort" "http" "context" $) | nindent 10 }}
+  {{- end }}
+  tls:
+  {{- if and .Values.ingress.tls }}
+  - hosts:
+    - {{ .Values.ingress.hostname | quote }}
+    secretName: {{ printf "%s-tls" .Values.ingress.hostname }}
+  {{- end }}
+  {{- if .Values.ingress.extraTls }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.ingress.extraTls "context" $ ) | nindent 2 }}
   {{- end }}
 {{- end }}

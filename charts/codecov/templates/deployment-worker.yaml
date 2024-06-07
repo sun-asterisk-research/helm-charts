@@ -19,32 +19,27 @@ spec:
         app.kubernetes.io/component: worker
     spec:
       serviceAccountName: {{ include "codecov.serviceAccountName" . }}
-      {{- with .Values.worker.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "codecov.imagePullSecrets" . | nindent 6 }}
       containers:
-      - name: worker
-        image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag | default .Chart.AppVersion }}"
+      - name: codecov-worker
+        image: {{ template "codecov.images.worker" . }}
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         args: {{- include "common.tplvalues.render" (dict "value" .Values.worker.args "context" $) | nindent 10 }}
         env:
-          - name: RUN_ENV
-            value: "ENTERPRISE"
-          {{- with .Values.extraEnvs }}
-          {{- toYaml . | nindent 10 }}
-          {{- end }}
+        - name: RUN_ENV
+          value: "ENTERPRISE"
+        {{- with .Values.extraEnvs }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         envFrom:
           {{- include "codecov.env" . | nindent 8 }}
         volumeMounts:
         - name: codecov-config
           mountPath: "/config"
         {{- include "codecov.volumeMounts" . | nindent 8 }}
-        {{- with .Values.volumeMounts }}
-        {{- toYaml . | nindent 12 }}
+        {{- if .Values.worker.containerSecurityContext.enabled }}
+        securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.worker.containerSecurityContext "context" $) | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.worker.securityContext | nindent 12 }}
         resources:
           {{- toYaml .Values.worker.resources | nindent 12 }}
       volumes:
@@ -70,5 +65,6 @@ spec:
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.worker.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
       {{- if .Values.worker.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.worker.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.worker.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
+      enableServiceLinks: false

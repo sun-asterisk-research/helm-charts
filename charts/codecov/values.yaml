@@ -1,51 +1,55 @@
-imagePullSecrets: []
+global:
+  image:
+    imageRegistry: ""
+    imagePullSecrets: []
+
 nameOverride: ""
 fullnameOverride: ""
 
+clusterDomain: cluster.local
+
 config:
-  codecovConfig: |-
-    setup:
-      admins:
-        - service: github
-          username: "username"
-    services:
-      minio:
-        verify_ssl: false
-        port: 443
   setup:
-    codecovHost: codecov.local
-    codecovScheme: https
-    codecovUrl: https://codecov.local
-    codecovApiUrl: https://codecov.local
+    loglvl: INFO
+    codecovHost: ""
+    codecovScheme: ""
+    codecovUrl: ""
+    codecovApiUrl: ""
     timeseries:
       enabled: false
-    enterprise_license: "very-long-license-key"
+    enterprise_license: ""
     http:
-      cookie_secret: "secrets"
+      cookie_secret: ""
   site:
     comment:
       layout: "reach,diff,flags,tree"
   github:
-    client_id: "Iv1.xxx"
-    client_secret: "secret"
-    global_upload_token: "upload-token"
-    webhook_secret: "secret"
+    ## e.g:
+    ##   client_id: "Iv1.xxx"
+    ##   client_secret: "secret
+    client_id: ""
+    client_secret: ""
+    global_upload_token: ""
+    webhook_secret: ""
     integration:
-      id: 1
+      id: ""
       pem: /home/codecov/github-app-private.key
   services:
     minio:
-      host: "ap-south-1.linodeobjects.com"
-      bucket: "codecov"
-      region: "ap-south-1"
-      accessKeyId: "access-key"
-      secretAccessKey: "secret-key"
+      host: ""
+      port: ""
+      bucket: ""
+      region: ""
+      verifySsl: false
+      accessKeyId: ""
+      secretAccessKey: ""
     postgres:
-      username: "codecov"
-      password: "secret"
       database: "codecov"
-      host: "localhost"
+      username: "codecov"
+      password: ""
+      host: ""
       port: 5432
+
 secretFiles:
   github-app-private.key: |-
     -----BEGIN RSA PRIVATE KEY-----
@@ -54,20 +58,15 @@ secretFiles:
 
 extraEnvs: []
 
-volumes: []
-
-volumeMounts: []
-
 api:
   replicaCount: 1
 
   image:
-    repository: codecov/enterprise-api
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    registry: docker.io
+    repository: codecov/self-hosted-api
     tag: ""
-
-  imagePullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
 
   podAnnotations: {}
 
@@ -75,7 +74,7 @@ api:
     enabled: true
     fsGroup: 101
 
-  securityContext:
+  containerSecurityContext:
     enabled: true
     runAsNonRoot: true
     runAsUser: 100
@@ -84,8 +83,6 @@ api:
   service:
     type: ClusterIP
     port: 80
-
-  containerPort: 8000
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -123,15 +120,14 @@ worker:
   replicaCount: 1
 
   image:
-    repository: codecov/enterprise-worker
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    registry: docker.io
+    repository: codecov/self-hosted-worker
     tag: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
 
   args:
   - worker
-
-  imagePullSecrets: []
 
   podAnnotations: {}
 
@@ -139,7 +135,7 @@ worker:
     enabled: true
     fsGroup: 101
 
-  securityContext:
+  containerSecurityContext:
     enabled: true
     runAsNonRoot: true
     runAsUser: 100
@@ -180,19 +176,19 @@ gateway:
   replicaCount: 1
 
   image:
-    repository: codecov/enterprise-gateway
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    registry: docker.io
+    repository: codecov/self-hosted-gateway
     tag: ""
-
-  imagePullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
 
   podAnnotations: {}
 
-  podSecurityContext: {}
-  # fsGroup: 2000
+  podSecurityContext:
+    enabled: false
 
-  securityContext: {}
+  containerSecurityContext:
+    enabled: false
     # capabilities:
     #   drop:
     #   - ALL
@@ -203,8 +199,6 @@ gateway:
   service:
     type: ClusterIP
     port: 80
-
-  containerPort: 8080
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -242,19 +236,19 @@ frontend:
   replicaCount: 1
 
   image:
-    repository: codecov/enterprise-frontend
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
+    registry: docker.io
+    repository: codecov/self-hosted-frontend
     tag: ""
-
-  imagePullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
 
   podAnnotations: {}
 
-  podSecurityContext: {}
-  # fsGroup: 2000
+  podSecurityContext:
+    enabled: false
 
-  securityContext: {}
+  containerSecurityContext:
+    enabled: false
     # capabilities:
     #   drop:
     #   - ALL
@@ -265,9 +259,6 @@ frontend:
   service:
     type: ClusterIP
     port: 80
-
-  containerPort: 8080
-
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -310,69 +301,35 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
 service:
   type: ClusterIP
   port: 80
 
 ingress:
-  enabled: true
-  ingressClassName: nginx
+  enabled: false
   annotations: {}
-  hosts:
-    - host: codecov.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-#  - secretName: codecov-tls
-#    hosts:
-#      - codecov.local
+  hostname: codecov.local
+  path: /
+  pathType: ImplementationSpecific
+  tls: false
+  extraHosts: []
+  extraTls: []
 
 redis:
-  enabled: true
-  architecture: standalone
-  auth:
-    enabled: true
-    password: "REDIS_PASSWORD"
-  master:
-    persistence:
-      enabled: true
-      size: 8Gi
-  replica:
-    replicaCount: 0
+  enabled: false
 
 postgresql:
   enabled: false
-  architecture: standalone
   image:
     tag: 14.5.0-debian-11-r29
-  postgresPassword: "testpassword"
-  service:
-    port: 5432
   auth:
-    postgresPassword: "testpassword"
     database: "codecov"
     username: codecov
-    password: "testpassword"
-  primary:
-    persistence:
-      enabled: false
+    password: "secret"
+    postgresPassword: "secret"
 
 timescaledb:
-  enabled: true
+  enabled: false
   fullnameOverride: "codecov-timescaledb"
   replicaCount: 1
   image:
@@ -397,5 +354,4 @@ minio:
   auth:
     rootUser: minioadmin
     rootPassword: minioadmin
-  persistence:
-    enabled: false
+  defaultBuckets: minio

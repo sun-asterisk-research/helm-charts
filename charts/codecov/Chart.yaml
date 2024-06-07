@@ -2,26 +2,26 @@ apiVersion: v2
 name: codecov
 description: A Helm chart for Codecov
 type: application
-version: 0.1.5
-appVersion: "v5.0.1"
+version: 1.0.0
+appVersion: "24.5.1"
 dependencies:
 - name: common
-  version: 1.0.0
-  repository: https://sun-asterisk-research.github.io/helm-charts
-- name: redis
-  version: 17.0.11
-  repository: https://charts.bitnami.com/bitnami
-  condition: redis.enabled
+  version: 2.19.2
+  repository: oci://registry-1.docker.io/bitnamicharts
+- name: minio
+  version: 14.4.1
+  repository: oci://registry-1.docker.io/bitnamicharts
+  condition: minio.enabled
 - name: postgresql
-  version: 12.1.2
-  repository: https://charts.bitnami.com/bitnami
+  version: 15.3.1
+  repository: oci://registry-1.docker.io/bitnamicharts
   condition: postgresql.enabled
+- name: redis
+  version: 19.3.1
+  repository: oci://registry-1.docker.io/bitnamicharts
+  condition: redis.enabled
 - name: timescaledb-single
   alias: timescaledb
   version: 0.33.*
   repository: https://charts.timescale.com/
   condition: timescaledb.enabled
-- name: minio
-  version: 11.8.1
-  repository: https://charts.bitnami.com/bitnami
-  condition: minio.enabled

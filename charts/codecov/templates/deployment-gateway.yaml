@@ -17,29 +17,34 @@ spec:
         app.kubernetes.io/component: gateway
     spec:
       serviceAccountName: {{ include "codecov.serviceAccountName" . }}
-      {{- with .Values.gateway.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "codecov.imagePullSecrets" . | nindent 6 }}
       containers:
-      - name: gateway
-        image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag | default .Chart.AppVersion }}"
+      - name: codecov-gateway
+        image: {{ template "codecov.images.gateway" . }}
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         env:
           - name: CODECOV_GATEWAY_MINIO_ENABLED
             value: "false"
           - name: CODECOV_API_HOST
-            value: {{ include "common.names.fullname" . }}-api-svc
+            value: {{ include "common.names.fullname" . }}-api
           - name: CODECOV_API_PORT
             value: {{ .Values.api.service.port | quote }}
+          - name: CODECOV_API_SCHEME
+            value: http
           - name: CODECOV_IA_HOST
-            value: {{ include "common.names.fullname" . }}-api-svc
+            value: {{ include "common.names.fullname" . }}-api
           - name: CODECOV_IA_PORT
             value: {{ .Values.api.service.port | quote }}
-          - name: CODECOV_FRONTEND_HOST
-            value: {{ include "common.names.fullname" . }}-frontend-svc
-          - name: CODECOV_FRONTEND_PORT
+          - name: CODECOV_IA_SCHEME
+            value: http
+          - name: CODECOV_DEFAULT_HOST
+            value: {{ include "common.names.fullname" . }}-frontend
+          - name: CODECOV_DEFAULT_PORT
             value: {{ .Values.frontend.service.port | quote }}
+          - name: CODECOV_DEFAULT_SCHEME
+            value: http
+          - name: CODECOV_GATEWAY_HTTP_PORT
+            value: "8080"
           {{- if .Values.minio.enabled }}
           - name: CODECOV_MINIO_HOST
             value: {{ include "common.names.fullname" . }}-minio
@@ -52,9 +57,9 @@ spec:
         envFrom:
           {{- include "codecov.env" . | nindent 8 }}
         ports:
-          - name: http
-            containerPort: {{ .Values.gateway.containerPort }}
-            protocol: TCP
+        - name: http
+          containerPort: 8080
+          protocol: TCP
         livenessProbe:
           httpGet:
             path: /gateway_health
@@ -63,8 +68,9 @@ spec:
           httpGet:
             path: /gateway_health
             port: http
-        securityContext:
-          {{- toYaml .Values.gateway.securityContext | nindent 12 }}
+        {{- if .Values.gateway.containerSecurityContext.enabled }}
+        securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.gateway.containerSecurityContext "context" $) | nindent 10 }}
+        {{- end }}
         resources:
           {{- toYaml .Values.gateway.resources | nindent 12 }}
       volumes:
@@ -86,6 +92,7 @@ spec:
       {{- if .Values.gateway.topologySpreadConstraints }}
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
-      {{- if .Values.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- if .Values.gateway.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.gateway.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
+      enableServiceLinks: false
