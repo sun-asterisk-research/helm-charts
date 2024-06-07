@@ -34,9 +34,10 @@ jobs:
           helm repo update
 
       - name: Release Charts
-        uses: helm/chart-releaser-action@v1.3.0
+        uses: helm/chart-releaser-action@v1.6.0
         with:
           config: cr.yaml
           charts_dir: charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          HELM_EXPERIMENTAL_OCI: "1"
