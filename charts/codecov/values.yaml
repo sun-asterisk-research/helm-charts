@@ -9,6 +9,11 @@ fullnameOverride: ""
 clusterDomain: cluster.local
 
 config:
+  codecovYml: |
+    setup:
+      admins:
+        - service: github
+          username: username
   setup:
     loglvl: INFO
     codecovHost: ""
