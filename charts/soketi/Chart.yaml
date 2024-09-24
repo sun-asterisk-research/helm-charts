@@ -2,8 +2,8 @@ apiVersion: v2
 name: soketi
 description: Just another simple, fast, and resilient open-source WebSockets server.
 type: application
-version: 0.2.2
-appVersion: "1.4.0"
+version: 0.2.3
+appVersion: 1.6.1
 dependencies:
 - name: common
   version: 1.0.0
