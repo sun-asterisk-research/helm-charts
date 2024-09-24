@@ -1,5 +1,9 @@
 name: GitHub CI
 
+permissions:
+  contents: write
+  packages: write
+
 on:
   push:
     branches:
@@ -15,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -31,7 +35,6 @@ jobs:
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo add sunasteriskrnd https://sun-asterisk-research.github.io/helm-charts
           helm repo add timescale https://charts.timescale.com
-          helm repo update
 
       - name: Release Charts
         uses: helm/chart-releaser-action@v1.6.0
