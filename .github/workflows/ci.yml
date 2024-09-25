@@ -55,5 +55,11 @@ jobs:
       - name: Push Charts to GHCR
         run: |
           for pkg in .cr-release-packages/*.tgz; do
-            helm push "${pkg}" oci://ghcr.io/${{ github.repository }}
+            name="$(helm show chart "${pkg}" | yq e '.name')"
+            version="$(helm show chart "${pkg}" | yq e '.version')"
+            if helm show chart oci://ghcr.io/${{ github.repository }}/${name} --version "${version}" >/dev/null 2>&1; then
+              echo Version "${version}" already exist for chart "${name}". Skipping...
+            else
+              helm push "${pkg}" oci://ghcr.io/${{ github.repository }}
+            fi
           done
