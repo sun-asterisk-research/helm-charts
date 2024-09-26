@@ -485,6 +485,20 @@ entries:
     version: 0.1.1
   grafana-dashboards:
   - apiVersion: v2
+    appVersion: 0.3.0
+    created: "2024-09-26T08:41:04.554355429Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 2.23.0
+    description: A collection of Grafana dashboards
+    digest: 1510dfb65e40fb19497d0d6d08757d62e7dddcb63c1783bc9e87017aa702eaa1
+    name: grafana-dashboards
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/grafana-dashboards-0.3.0/grafana-dashboards-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     appVersion: 0.2.0
     created: "2022-10-24T07:37:05.72094322Z"
     dependencies:
@@ -965,4 +979,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2024-09-26T05:14:49.063379542Z"
+generated: "2024-09-26T08:41:04.554414228Z"
