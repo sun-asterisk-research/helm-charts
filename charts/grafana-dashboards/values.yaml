@@ -21,8 +21,8 @@ commonAnnotations: {}
 ## @param defaultDashboards Dashboards included by default
 ##
 defaultDashboards:
-- nodes
-- kube-resources
+- kubernetes-resources
+- node-exporter
 
 ## @param includeDefaultDashboards Whether to include default dashboards when extra dashboards is set
 ##
