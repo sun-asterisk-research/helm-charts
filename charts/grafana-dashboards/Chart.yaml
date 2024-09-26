@@ -2,9 +2,9 @@ apiVersion: v2
 name: grafana-dashboards
 description: A collection of Grafana dashboards
 type: application
-version: 0.2.0
-appVersion: "0.2.0"
+version: 0.3.0
+appVersion: "0.3.0"
 dependencies:
 - name: common
-  version: 2.0.3
-  repository: https://charts.bitnami.com/bitnami
+  version: 2.23.0
+  repository: oci://registry-1.docker.io/bitnamicharts
