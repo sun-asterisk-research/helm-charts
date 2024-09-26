@@ -979,7 +979,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Request Handling Performance",
+  "title": "NGINX Request Handling Performance",
   "uid": "nginx-requests",
   "version": 1,
   "weekStart": ""
