@@ -23771,8 +23771,8 @@
       {
         "current": {
           "selected": false,
-          "text": "default",
-          "value": "default"
+          "text": "Prometheus",
+          "value": "${DS_PROMETHEUS}"
         },
         "hide": 0,
         "includeAll": false,

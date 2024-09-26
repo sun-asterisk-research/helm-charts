@@ -675,6 +675,10 @@
               {
                 "id": "max",
                 "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
               }
             ]
           },
@@ -722,6 +726,10 @@
               {
                 "id": "max",
                 "value": 3
+              },
+              {
+                "id": "min",
+                "value": 0
               }
             ]
           },
@@ -765,6 +773,10 @@
               {
                 "id": "max",
                 "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
               }
             ]
           }
@@ -1024,6 +1036,10 @@
               {
                 "id": "max",
                 "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
               }
             ]
           },
@@ -1071,6 +1087,10 @@
               {
                 "id": "max",
                 "value": 3
+              },
+              {
+                "id": "min",
+                "value": 0
               }
             ]
           },
@@ -1114,6 +1134,10 @@
               {
                 "id": "max",
                 "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
               }
             ]
           }
@@ -1618,6 +1642,6 @@
   "timezone": "",
   "title": "Kubernetes Pods Resources Allocation & Usage",
   "uid": "kubernetes-resources",
-  "version": 6,
+  "version": 7,
   "weekStart": ""
 }
