@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: {{ template "common.names.fullname" . }}{{- if .Values.jobNameSuffix }}{{ include "common.tplvalues.render" (dict "value" .Values.jobNameSuffix "context" $) }}{{- end }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
     {{- if .Values.commonLabels }}

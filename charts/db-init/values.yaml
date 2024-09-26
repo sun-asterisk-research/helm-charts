@@ -12,6 +12,8 @@ image:
 
 debug: false
 
+jobNameSuffix: ""
+
 dbType: mysql
 
 mysql:
