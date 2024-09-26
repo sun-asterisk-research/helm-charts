@@ -2,7 +2,7 @@ apiVersion: v2
 name: grafana-dashboards
 description: A collection of Grafana dashboards
 type: application
-version: 0.3.2
+version: 0.3.3
 appVersion: "0.3.0"
 dependencies:
 - name: common
