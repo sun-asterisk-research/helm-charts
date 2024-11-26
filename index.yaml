@@ -386,6 +386,20 @@ entries:
   db-backup:
   - apiVersion: v2
     appVersion: 0.2.0
+    created: "2024-11-26T03:12:32.056405729Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 2.27.0
+    description: Database backup cronjob
+    digest: 64884497bfbc9f2e8a07fd649274a9f815c90a8762e697da54a86d5da0f98c2b
+    name: db-backup
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/db-backup-0.2.1/db-backup-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: 0.2.0
     created: "2022-03-07T21:27:29.762740366Z"
     dependencies:
     - name: common
@@ -1035,4 +1049,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/soketi-0.1.0/soketi-0.1.0.tgz
     version: 0.1.0
-generated: "2024-09-26T10:47:37.165856279Z"
+generated: "2024-11-26T03:12:32.056521905Z"
