@@ -11,5 +11,5 @@ Return the db-backup image for the cronjob
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "db-backup.imagePullSecrets" -}}
-{{- include "common.images.pullSecrets" (dict "images" (list .Values.image) "global" .Values.global) -}}
+{{- include "common.images.renderPullSecrets" (dict "images" (list .Values.image) "context" .) -}}
 {{- end -}}

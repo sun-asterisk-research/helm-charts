@@ -1,7 +1,7 @@
 {{- if .Values.cronjob.enabled -}}
 {{- range .Values.databases }}
 ---
-apiVersion: batch/v1beta1
+apiVersion: {{ include "common.capabilities.cronjob.apiVersion" $ }}
 kind: CronJob
 metadata:
   name: {{ include "common.names.fullname" $ }}-{{ regexReplaceAll "[^a-zA-Z0-9.-]" .name "-" }}
