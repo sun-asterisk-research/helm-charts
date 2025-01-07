@@ -123,15 +123,15 @@ ports:
 {{- end }}
 {{- if (.Args.livenessProbe).enabled }}
 livenessProbe:
-  {{- omit .Args.livenessProbe "enabled" | include "common.utils.renderYaml" | nindent 2 }}
+  {{- omit .Args.livenessProbe "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
 {{- if (.Args.readinessProbe).enabled }}
 readinessProbe:
-  {{- omit .Args.readinessProbe "enabled" | include "common.utils.renderYaml" | nindent 2 }}
+  {{- omit .Args.readinessProbe "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
 {{- if (.Args.startupProbe).enabled }}
 startupProbe:
-  {{- omit .Args.startupProbe "enabled" | include "common.utils.renderYaml" | nindent 2 }}
+  {{- omit .Args.startupProbe "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
 {{- if .Values.lifecycleHooks }}
 lifecycle:
@@ -144,7 +144,7 @@ resources:
 {{- if or .Args.volumeMounts .Values.extraVolumeMounts }}
 volumeMounts:
   {{- if .Args.volumeMounts }}
-  {{- include "common.utils.renderYaml" .Args.volumeMounts | nindent 2 }}
+  {{- include "tplchart.utils.renderYaml" .Args.volumeMounts | nindent 2 }}
   {{- end }}
   {{- if .Values.extraVolumeMounts }}
   {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" .) | nindent 2 }}
