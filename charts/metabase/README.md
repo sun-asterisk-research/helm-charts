@@ -102,13 +102,15 @@ helm install metabase sunasteriskrnd/metabase
 
 | Name                               | Description                                                                     | Value            |
 | ---------------------------------- | ------------------------------------------------------------------------------- | ---------------- |
-| `service.annotations`              | Service annotations                                                             | `[]`             |
 | `service.type`                     | Kubernetes Service type                                                         | `ClusterIP`      |
-| `service.port`                     | Kubernetes Service port                                                         | `80`             |
-| `service.nodePort`                 | NodePort if Service type is `LoadBalancer` or `NodePort`                        | `""`             |
-| `service.externalTrafficPolicy`    | Whether to route external traffic to node-local or cluster-wide endpoints       | `Cluster`        |
+| `service.labels`                   | Additional labels for service                                                   | `{}`             |
+| `service.annotations`              | Additional annotations for service                                              | `{}`             |
+| `service.ports.http`               | Port for metabase container                                                     | `80`             |
+| `service.nodePorts.http`           | Port to bind to for NodePort service                                            | `""`             |
 | `service.clusterIP`                | Service Cluster IP                                                              | `""`             |
-| `service.loadBalancerSourceRanges` | Limit which client IP's can access the Network Load Balancer                    | `[]`             |
+| `service.loadBalancerIP`           | loadBalancerIP if service type is `LoadBalancer`                                | `""`             |
+| `service.loadBalancerSourceRanges` | Addresses that are allowed when service is `LoadBalancer`                       | `[]`             |
+| `service.externalTrafficPolicy`    | Whether to route external traffic to node-local or cluster-wide endpoints       | `Cluster`        |
 | `ingress.enabled`                  | Enable ingress resource generation                                              | `false`          |
 | `ingress.annotations`              | Additional annotations for the Ingress resource                                 | `{}`             |
 | `ingress.ingressClassName`         | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)   | `nil`            |

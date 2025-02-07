@@ -227,22 +227,28 @@ extraEnvVars: {}
 
 ## @section Traffic exposure parameters
 ##
-## @param service.annotations Service annotations
 ## @param service.type Kubernetes Service type
-## @param service.port Kubernetes Service port
-## @param service.nodePort NodePort if Service type is `LoadBalancer` or `NodePort`
-## @param service.externalTrafficPolicy Whether to route external traffic to node-local or cluster-wide endpoints
+## @param service.labels Additional labels for service
+## @param service.annotations Additional annotations for service
+## @param service.ports.http Port for metabase container
+## @param service.nodePorts.http Port to bind to for NodePort service
 ## @param service.clusterIP Service Cluster IP
-## @param service.loadBalancerSourceRanges Limit which client IP's can access the Network Load Balancer
+## @param service.loadBalancerIP loadBalancerIP if service type is `LoadBalancer`
+## @param service.loadBalancerSourceRanges Addresses that are allowed when service is `LoadBalancer`
+## @param service.externalTrafficPolicy Whether to route external traffic to node-local or cluster-wide endpoints
 ##
 service:
-  annotations: []
   type: ClusterIP
-  port: 80
-  nodePort: ""
-  externalTrafficPolicy: Cluster
+  labels: {}
+  annotations: {}
+  ports:
+    http: 80
+  nodePorts:
+    http: ""
   clusterIP: ""
+  loadBalancerIP: ""
   loadBalancerSourceRanges: []
+  externalTrafficPolicy: Cluster
 
 ## @param ingress.enabled Enable ingress resource generation
 ## @param ingress.annotations Additional annotations for the Ingress resource

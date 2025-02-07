@@ -2,7 +2,7 @@ apiVersion: v2
 name: metabase
 description: The simplest, fastest way to get business intelligence and analytics to everyone in your company.
 type: application
-version: 1.0.5
+version: 1.0.6
 appVersion: v0.53.1
 dependencies:
 - name: tplchart
