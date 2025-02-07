@@ -1,108 +1,74 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ include "common.names.fullname" . }}
-  labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
-spec:
-  selector:
-    matchLabels:
-      {{- include "common.labels.matchLabels" . | nindent 6 }}
-  {{- if .Values.updateStrategy }}
-  strategy: {{ toYaml .Values.updateStrategy | nindent 4 }}
-  {{- end }}
-  replicas: {{ .Values.replicaCount }}
-  template:
-    metadata:
-      labels:
-        {{- include "common.labels.standard" . | nindent 8 }}
-        {{- if .Values.podLabels }}
-        {{- toYaml .Values.podLabels | nindent 8 }}
-        {{- end }}
-      annotations:
-        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-        {{- with .Values.podAnnotations }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-    spec:
-      serviceAccountName: {{ include "metabase.serviceAccountName" . }}
-      {{- include "metabase.imagePullSecrets" . | indent 6 }}
-      {{- if .Values.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
-      {{- end }}
-      containers:
-      - name: metabase
-        image: {{ template "metabase.image" . }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        {{- if .Values.extraEnvVars }}
-        env:
-        {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 8 }}
-        {{- end }}
-        envFrom:
-        - configMapRef:
-            name: {{ template "common.names.fullname" . }}
-        - secretRef:
-            name: {{ template "common.names.fullname" . }}
-        ports:
-        - name: http
-          containerPort: {{ .Values.jetty.port }}
-          protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: {{ .Values.jetty.port }}
-          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
-          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-          successThreshold: {{ .Values.livenessProbe.successThreshold }}
-          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
-        readinessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.jetty.port }}
-          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-          successThreshold: {{ .Values.readinessProbe.successThreshold }}
-          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-        resources:
-          {{- toYaml .Values.resources | nindent 10 }}
-        {{- if .Values.containerSecurityContext.enabled }}
-        securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
-        {{- end }}
-        {{- if eq .Values.database.type "h2" }}
-        volumeMounts:
-        - name: data
-          mountPath: /metabase.db
-        {{- end }}
-      volumes:
-      {{- if eq .Values.database.type "h2" }}
-      - name: data
-      {{- if and .Values.persistence.enabled (not .Values.persistence.hostPath) }}
-        persistentVolumeClaim:
-          claimName: {{ include "common.names.fullname" . }}
-      {{- else if and .Values.persistence.enabled .Values.persistence.hostPath }}
-        hostPath:
-          path: {{ .Values.persistence.hostPath }}
-      {{- else }}
-        emptyDir: {}
-      {{- end }}
-      {{- end }}
-      {{- if .Values.affinity }}
-      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.affinity "context" $) | nindent 8 }}
-      {{- else }}
-      affinity:
-        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.podAffinityPreset "context" $) | nindent 10 }}
-        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.podAntiAffinityPreset "context" $) | nindent 10 }}
-        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.nodeAffinityPreset.type "key" .Values.nodeAffinityPreset.key "values" .Values.nodeAffinityPreset.values) | nindent 10 }}
-      {{- end }}
-      {{- if .Values.nodeSelector }}
-      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.nodeSelector "context" $) | nindent 8 }}
-      {{- end }}
-      {{- if .Values.tolerations }}
-      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
-      {{- end }}
-      {{- if .Values.topologySpreadConstraints }}
-      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.topologySpreadConstraints "context" .) | nindent 8 }}
-      {{- end }}
+{{- $args := dict
+  "checksumAnnotations" (dict
+    "envCM"     "configmap.yaml"
+    "envSecret" "secret.yaml"
+  )
+  "container" (dict
+    "image" (empty .Values.image.tag | ternary (merge .Values.image (dict "tag" .Chart.AppVersion)) .Values.image)
+    "ports" (dict
+      "http" 3000
+    )
+    "envVars" (dict
+      "MB_JETTY_HOST" "0.0.0.0"
+      "MB_JETTY_PORT" 3000
+    )
+    "envVarsCM" (include "common.names.fullname" .)
+    "envVarsSecret" (include "common.names.fullname" .)
+    "livenessProbe" (dict
+      "httpGet" (dict
+        "path" "/api/health"
+        "port" 3000
+      )
+    )
+    "readinessProbe" (dict
+      "httpGet" (dict
+        "path" "/"
+        "port" 3000
+      )
+    )
+    "volumeMounts" (eq .Values.database.type "h2" | ternary
+      (list
+        (dict
+          "name"      "data"
+          "mountPath" "/metabase.db"
+        )
+      )
+      nil
+    )
+  )
+  "volumes" (eq .Values.database.type "h2" | ternary
+    (list
+      (dict
+        (.Values.persistence.enabled | ternary
+          (empty .Values.persistence.hostPath | ternary
+            (dict
+              "name" "data"
+              "persistentVolumeClaim" (dict
+                "claimName" (include "common.names.fullname" .)
+              )
+            )
+            (dict
+              "name" "data"
+              "hostPath" (dict
+                "path" .Values.persistence.hostPath
+              )
+            )
+          )
+          (dict
+            "name" "data"
+            "emptyDir" dict
+          )
+        )
+      )
+    )
+    nil
+  )
+-}}
+
+{{- include "tplchart.deployment" (dict
+  "args" $args
+  "values" (dict
+    "deployment" .Values
+  )
+  "context" .
+) -}}

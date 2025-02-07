@@ -1,41 +1,5 @@
-{{- if .Values.ingress.enabled -}}
-{{- $fullName := include "common.names.fullname" . -}}
-apiVersion: {{ template "common.capabilities.ingress.apiVersion" . }}
-kind: Ingress
-metadata:
-  name: {{ $fullName }}
-  labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
-  annotations:
-    {{- if and .Values.ingress.ingressClassName (eq "false" (include "common.ingress.supportsIngressClassname" .)) }}
-    kubernetes.io/ingress.class: {{ .Values.ingress.ingressClassName | quote }}
-    {{- end }}
-    {{- with .Values.ingress.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-spec:
-  {{- if and .Values.ingress.ingressClassName (include "common.ingress.supportsIngressClassname" .) }}
-  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
-  {{- end }}
-  tls:
-  {{- range .Values.ingress.tls }}
-  - hosts:
-    {{- range .hosts }}
-    - {{ . | quote }}
-    {{- end }}
-    secretName: {{ .secretName }}
-  {{- end }}
-  rules:
-  {{- range .Values.ingress.hosts }}
-  - host: {{ .host | quote }}
-    http:
-      paths:
-      {{- range .paths | default (list (dict)) }}
-      - path: {{ .path | default "/" }}
-        {{- if eq "true" (include "common.ingress.supportsPathType" $) }}
-        pathType: {{ .pathType | default "ImplementationSpecific" }}
-        {{- end }}
-        backend: {{- include "common.ingress.backend" (dict "serviceName" $fullName "servicePort" "http" "context" $) | nindent 10 }}
-      {{- end }}
-  {{- end }}
-{{- end }}
+{{- $args := (dict
+  "serviceName" (include "common.names.fullname" .)
+  "servicePort" "http"
+) -}}
+{{- include "tplchart.ingress" (dict "context" . "values" .Values "args" $args) -}}

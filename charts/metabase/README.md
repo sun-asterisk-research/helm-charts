@@ -17,7 +17,6 @@ helm install metabase sunasteriskrnd/metabase
 | ------------------------- | ------------------------- | ----- |
 | `global.imagePullSecrets` | Global image pull secrets | `[]`  |
 
-
 ### Common parameters
 
 | Name                | Description                                          | Value               |
@@ -29,7 +28,6 @@ helm install metabase sunasteriskrnd/metabase
 | `image.tag`         | Image tag (default to `.Chart.AppVersion`)           | `""`                |
 | `image.pullPolicy`  | Image pull policy                                    | `IfNotPresent`      |
 | `image.pullSecrets` | Image pull secrets                                   | `[]`                |
-
 
 ### Deployment parameters
 
@@ -64,7 +62,6 @@ helm install metabase sunasteriskrnd/metabase
 | `tolerations`                        | Tolerations for pod assignment. Evaluated as a template.                                  | `[]`    |
 | `topologySpreadConstraints`          | Topology Spread Constraints for pod assignment. Evaluated as a template                   | `[]`    |
 
-
 ### Metabase configuration parameters
 
 | Name                                      | Description                                                                                                                                    | Value       |
@@ -94,8 +91,6 @@ helm install metabase sunasteriskrnd/metabase
 | `mail.smtp.username`                      | SMTP username                                                                                                                                  | `""`        |
 | `mail.smtp.password`                      | SMTP password                                                                                                                                  | `""`        |
 | `mail.smtp.encryption`                    | SMTP secure connection protocol (`tls`, `ssl`, `starttls`, `none`)                                                                             | `none`      |
-| `jetty.host`                              | Configure a host either as a host name or IP address to identify a specific network interface on which to listen                               | `0.0.0.0`   |
-| `jetty.port`                              | Configure which port to use for HTTP                                                                                                           | `3000`      |
 | `jetty.maxThreads`                        | Maximum number of threads                                                                                                                      | `50`        |
 | `jetty.minThreads`                        | Minimum number of threads                                                                                                                      | `8`         |
 | `telemetry`                               | Enable the collection of anonymous usage data in order to help Metabase improve                                                                | `false`     |
@@ -103,24 +98,30 @@ helm install metabase sunasteriskrnd/metabase
 | `javaOpts`                                | `JAVA_OPTS` environment variable                                                                                                               | `""`        |
 | `extraEnvVars`                            | Extra environment variables for containers                                                                                                     | `{}`        |
 
-
 ### Traffic exposure parameters
 
-| Name                               | Description                                                                   | Value       |
-| ---------------------------------- | ----------------------------------------------------------------------------- | ----------- |
-| `service.annotations`              | Service annotations                                                           | `[]`        |
-| `service.type`                     | Kubernetes Service type                                                       | `ClusterIP` |
-| `service.port`                     | Kubernetes Service port                                                       | `80`        |
-| `service.nodePort`                 | NodePort if Service type is `LoadBalancer` or `NodePort`                      | `""`        |
-| `service.externalTrafficPolicy`    | Whether to route external traffic to node-local or cluster-wide endpoints     | `Cluster`   |
-| `service.clusterIP`                | Service Cluster IP                                                            | `""`        |
-| `service.loadBalancerSourceRanges` | Limit which client IP's can access the Network Load Balancer                  | `[]`        |
-| `ingress.enabled`                  | Enable ingress resource generation                                            | `false`     |
-| `ingress.annotations`              | Additional annotations for the Ingress resource                               | `{}`        |
-| `ingress.ingressClassName`         | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+) | `nil`       |
-| `ingress.hosts`                    | Ingress hosts                                                                 | `[]`        |
-| `ingress.tls`                      | Ingress tls hosts                                                             | `[]`        |
-
+| Name                               | Description                                                                     | Value            |
+| ---------------------------------- | ------------------------------------------------------------------------------- | ---------------- |
+| `service.annotations`              | Service annotations                                                             | `[]`             |
+| `service.type`                     | Kubernetes Service type                                                         | `ClusterIP`      |
+| `service.port`                     | Kubernetes Service port                                                         | `80`             |
+| `service.nodePort`                 | NodePort if Service type is `LoadBalancer` or `NodePort`                        | `""`             |
+| `service.externalTrafficPolicy`    | Whether to route external traffic to node-local or cluster-wide endpoints       | `Cluster`        |
+| `service.clusterIP`                | Service Cluster IP                                                              | `""`             |
+| `service.loadBalancerSourceRanges` | Limit which client IP's can access the Network Load Balancer                    | `[]`             |
+| `ingress.enabled`                  | Enable ingress resource generation                                              | `false`          |
+| `ingress.annotations`              | Additional annotations for the Ingress resource                                 | `{}`             |
+| `ingress.ingressClassName`         | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)   | `nil`            |
+| `ingress.hostname`                 | Default host's hostname for the ingress resource                                | `metabase.local` |
+| `ingress.path`                     | Default host's path for the ingress resource                                    | `/`              |
+| `ingress.tls`                      | Ingress Enable TLS configuration for the hostname defined at `ingress.hostname` | `false`          |
+| `ingress.selfSigned`               | Create a self-signed certificate for the hostname defined at `ingress.hostname` | `false`          |
+| `ingress.existingSecret`           | Use an existing secret for the hostname defined at `ingress.hostname`           | `""`             |
+| `ingress.secrets`                  | Create extra TLS secrets                                                        | `[]`             |
+| `ingress.extraHosts`               | List of additional hostnames                                                    | `[]`             |
+| `ingress.extraPaths`               | Additional paths for default host                                               | `[]`             |
+| `ingress.extraTls`                 | Extra TLS configuration for default host                                        | `[]`             |
+| `ingress.extraRules`               | Additional ingress rules                                                        | `[]`             |
 
 ### Persistence parameter
 
@@ -131,7 +132,6 @@ helm install metabase sunasteriskrnd/metabase
 | `persistence.storageClass` | Persistent Volume storage class                 | `""`                |
 | `persistence.accessModes`  | Persistent Volume access modes                  | `["ReadWriteOnce"]` |
 | `persistence.size`         | Persistent Volume size                          | `1Gi`               |
-
 
 ### ServiceAccount parameters
 

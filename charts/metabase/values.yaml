@@ -202,14 +202,10 @@ mail:
     password: ""
     encryption: none
 
-## @param jetty.host Configure a host either as a host name or IP address to identify a specific network interface on which to listen
-## @param jetty.port Configure which port to use for HTTP
 ## @param jetty.maxThreads Maximum number of threads
 ## @param jetty.minThreads Minimum number of threads
 ##
 jetty:
-  host: "0.0.0.0"
-  port: 3000
   maxThreads: 50
   minThreads: 8
 
@@ -251,21 +247,31 @@ service:
 ## @param ingress.enabled Enable ingress resource generation
 ## @param ingress.annotations Additional annotations for the Ingress resource
 ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
-## @param ingress.hosts Ingress hosts
-## @param ingress.tls Ingress tls hosts
+## @param ingress.hostname Default host's hostname for the ingress resource
+## @param ingress.path Default host's path for the ingress resource
+## @param ingress.tls Ingress Enable TLS configuration for the hostname defined at `ingress.hostname`
+## @param ingress.selfSigned Create a self-signed certificate for the hostname defined at `ingress.hostname`
+## @param ingress.existingSecret Use an existing secret for the hostname defined at `ingress.hostname`
+## @param ingress.secrets Create extra TLS secrets
+## @param ingress.extraHosts List of additional hostnames
+## @param ingress.extraPaths Additional paths for default host
+## @param ingress.extraTls Extra TLS configuration for default host
+## @param ingress.extraRules Additional ingress rules
 ##
 ingress:
   enabled: false
-  annotations: {}
   ingressClassName:
-  hosts: []
-  # - host: 'example.com'
-  #   paths:
-  #   - path: '/socket.io'
-  tls: []
-  # - hosts:
-  #   - example.com
-  #   secretName: example.com-tls
+  annotations: {}
+  hostname: metabase.local
+  path: /
+  tls: false
+  selfSigned: false
+  existingSecret: ""
+  secrets: []
+  extraHosts: []
+  extraPaths: []
+  extraTls: []
+  extraRules: []
 
 ## @section Persistence parameter
 ##
