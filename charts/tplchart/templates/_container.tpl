@@ -21,7 +21,7 @@ Render container env vars, whether provided a dict, a list of dict or raw string
 {{- else if kindIs "map" .values }}
 {{ range $key, $value := .values -}}
 - name: {{ $key }}
-  value: {{ $value }}
+  value: {{ $value | quote }}
 {{ end }}
 {{- else if kindIs "slice" .values }}
 {{ range .values -}}
@@ -29,7 +29,7 @@ Render container env vars, whether provided a dict, a list of dict or raw string
 {{- fail (printf "Invalid type for envVars item. Expected map. Got %s." (kindOf .)) -}}
 {{- end -}}
 - name: {{ .name }}
-  value: {{ .value }}
+  value: {{ .value | quote }}
 {{ end -}}
 {{- else -}}
 {{- fail (printf "Invalid type for envVars. Expected map or slice. Got %s." (kindOf .values)) -}}
@@ -61,7 +61,7 @@ name: {{ .Args.name | default .Chart.Name }}
 {{- if (.Values.containerSecurityContext).enabled }}
 securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 2 }}
 {{- end }}
-image: {{ include "common.images.image" (dict "imageRoot" .Args.image "global" .Values.global) }}
+image: {{ typeIs "string" .Args.image | ternary (.Args.image) (include "common.images.image" (dict "imageRoot" .Args.image "global" .Values.global)) }}
 imagePullPolicy: {{ default (eq .Args.image.tag "latest" | ternary "Always" "IfNotPresent") .Args.image.pullPolicy }}
 {{- if .Args.command }}
 command:
@@ -121,21 +121,29 @@ ports:
   {{- end }}
   {{- end -}}
 {{- end }}
-{{- if (.Args.livenessProbe).enabled }}
+{{- with merge (.Args.livenessProbe | default dict) (.Values.livenessProbe | default dict) }}
+{{- if .enabled }}
 livenessProbe:
-  {{- omit .Args.livenessProbe "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
+  {{- omit . "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
-{{- if (.Args.readinessProbe).enabled }}
+{{- end }}
+{{- with merge (.Args.readinessProbe | default dict) (.Values.readinessProbe | default dict) }}
+{{- if .enabled }}
 readinessProbe:
-  {{- omit .Args.readinessProbe "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
+  {{- omit . "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
-{{- if (.Args.startupProbe).enabled }}
+{{- end }}
+{{- with merge (.Args.startupProbe | default dict) (.Values.startupProbe | default dict) }}
+{{- if .enabled }}
 startupProbe:
-  {{- omit .Args.startupProbe "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
+  {{- omit . "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
-{{- if .Values.lifecycleHooks }}
+{{- end }}
+{{- with merge (.Args.lifecycleHooks | default dict) (.Values.lifecycleHooks | default dict) }}
+{{- if not (empty .) }}
 lifecycle:
-  {{- include "common.tplvalues.render" (dict "value" .Values.lifecycleHooks "context" .) | nindent 2 }}
+  {{- include "common.tplvalues.render" (dict "value" . "context" .) | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- if .Values.resources }}
 resources:

@@ -7,7 +7,7 @@
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
-  name: {{ (include "tplchart.common.fullname" (dict "nameTemplate" .Args.nameTemplate "context" .)) }}
+  name: {{ (include "tplchart.common.fullname" (dict "name" .Args.name "nameTemplate" .Args.nameTemplate "context" .)) }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels:
     {{- include "tplchart.common.labels" (dict "customLabels" (list .Args.labels .Values.commonLabels) "component" .Args.component "context" .) | nindent 4 }}

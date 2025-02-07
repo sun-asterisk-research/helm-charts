@@ -6,7 +6,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ (include "tplchart.common.fullname" (dict "name" .Args.name "nameTemplate" .Args.nameTemplate "context" .)) }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels:
     {{- include "tplchart.common.labels" (dict "customLabels" (list .Args.labels .Values.commonLabels) "component" .Args.component "context" .) | nindent 4 }}
@@ -32,7 +32,8 @@ stringData:
   {{- else -}}
   {{- range $key, $value := .Args.stringData }}
   {{- if $value | toString | contains "\n" }}
-  {{ $key }}: |- {{ $value | nindent 4 }}
+  {{ $key }}: |-
+    {{- $value | nindent 4 }}
   {{- else }}
   {{ $key }}: {{ $value | default "" | quote }}
   {{- end }}

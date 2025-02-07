@@ -1,31 +1,26 @@
-{{- define "tplchart.configMap" -}}
+{{- define "tplchart.pvc" -}}
 {{- $builtins := pick .context "Capabilities" "Chart" "Files" "Release" -}}
 {{- $ctx := merge $builtins (include "tplchart.utils.componentValues" . | fromYaml) -}}
 {{- with $ctx -}}
 ---
+kind: PersistentVolumeClaim
 apiVersion: v1
-kind: ConfigMap
 metadata:
   name: {{ (include "tplchart.common.fullname" (dict "name" .Args.name "nameTemplate" .Args.nameTemplate "context" .)) }}
-  namespace: {{ include "common.names.namespace" . | quote }}
   labels:
     {{- include "tplchart.common.labels" (dict "customLabels" (list .Args.labels .Values.commonLabels) "component" .Args.component "context" .) | nindent 4 }}
   {{- if or .Args.annotations .Values.commonAnnotations }}
   annotations:
     {{- include "tplchart.utils.renderDicts" (dict "values" (list .Args.annotations .Values.commonAnnotations) "context" .) | nindent 4 -}}
   {{- end }}
-data:
-  {{- if kindIs "string" .Args.data -}}
-  {{ .Args.data | nindent 2 }}
-  {{- else -}}
-  {{- range $key, $value := .Args.data }}
-  {{- if $value | toString | contains "\n" }}
-  {{ $key }}: |-
-    {{ $value | nindent 4 }}
-  {{- else }}
-  {{ $key }}: {{ $value | default "" | quote }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.accessModes }}
+  - {{ . | quote }}
   {{- end }}
-  {{- end }}
-  {{- end -}}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size | quote }}
+  {{- include "common.storage.class" (dict "persistence" .Values.persistence "global" .Values.global) | nindent 2 }}
 {{- end -}}
 {{- end -}}

@@ -3,11 +3,12 @@
 {{- $ctx := merge $builtins (include "tplchart.utils.componentValues" . | fromYaml) -}}
 {{- with $ctx -}}
 {{- if .Values.ingress.enabled -}}
+{{- $svcName := include "common.ingress.backend" (dict "serviceName" .Args.serviceName "servicePort" .Args.servicePort "context" .) -}}
 ---
 apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ (include "tplchart.common.fullname" (dict "name" .Args.name "nameTemplate" .Args.nameTemplate "context" .)) }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels:
     {{- include "tplchart.common.labels" (dict "customLabels" (list .Args.labels .Values.ingress.labels .Values.commonLabels) "component" .Args.component "context" .) | nindent 4 }}
@@ -31,7 +32,7 @@ spec:
             {{- if eq "true" (include "common.ingress.supportsPathType" .) }}
             pathType: {{ .Values.ingress.pathType | default "ImplementationSpecific" }}
             {{- end }}
-            backend: {{- include "common.ingress.backend" (dict "serviceName" .Args.serviceName "servicePort" .Args.servicePort "context" .)  | nindent 14 }}
+            backend: {{- $svcName | nindent 14 }}
     {{- end }}
     {{- range .Values.ingress.extraHosts }}
     - host: {{ include "common.tplvalues.render" (dict "value" .name "context" .) | quote }}
@@ -41,14 +42,14 @@ spec:
             {{- if eq "true" (include "common.ingress.supportsPathType" .) }}
             pathType: {{ .pathType | default "ImplementationSpecific" }}
             {{- end }}
-            backend: {{- include "common.ingress.backend" (dict "serviceName" .Args.serviceName "servicePort" .Args.servicePort "context" .) | nindent 14 }}
+            backend: {{- $svcName | nindent 14 }}
     {{- end }}
     {{- if .Values.ingress.extraRules }}
     {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraRules "context" .) | nindent 4 }}
     {{- end }}
-  {{- if or (and .Values.ingress.tls (or .Values.ingress.existingSecret (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.ingress.annotations )) .Values.ingress.selfSigned)) .Values.ingress.extraTls }}
+  {{- if or (and .Values.ingress.tls (or .Values.ingress.existingSecret (include "common.ingress.certManagerRequest" (dict "annotations" .Values.ingress.annotations)) .Values.ingress.selfSigned)) .Values.ingress.extraTls }}
   tls:
-    {{- if and .Values.ingress.tls (or .Values.ingress.existingSecret (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.ingress.annotations )) .Values.ingress.selfSigned) }}
+    {{- if and .Values.ingress.tls (or .Values.ingress.existingSecret (include "common.ingress.certManagerRequest" (dict "annotations" .Values.ingress.annotations)) .Values.ingress.selfSigned) }}
     - hosts:
         - {{ include "common.tplvalues.render" (dict "value" .Values.ingress.hostname "context" .) | quote }}
       {{- if .Values.ingress.existingSecret }}
@@ -58,9 +59,31 @@ spec:
       {{- end }}
     {{- end }}
     {{- if .Values.ingress.extraTls }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.ingress.extraTls "context" .) | nindent 4 }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraTls "context" .) | nindent 4 }}
     {{- end }}
   {{- end }}
-{{- end }}
+---
+{{- if and .Values.ingress.tls .Values.ingress.selfSigned -}}
+{{- $secretName := printf "%s-tls" .Values.ingress.hostname }}
+{{- $ca := genCA "kubernetes-ca" 365 }}
+{{- $cert := genSignedCert .Values.ingress.hostname nil (list .Values.ingress.hostname) 365 $ca }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $secretName }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels:
+    {{- include "tplchart.common.labels" (dict "customLabels" .Values.commonLabels "component" .Args.component "context" .) | nindent 4 }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "tplchart.utils.renderDicts" (dict "values" .Values.commonAnnotations "context" .) | nindent 4 -}}
+  {{- end }}
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ include "common.secrets.lookup" (dict "secret" $secretName "key" "tls.crt" "defaultValue" $cert.Cert "context" $) }}
+  tls.key: {{ include "common.secrets.lookup" (dict "secret" $secretName "key" "tls.key" "defaultValue" $cert.Key "context" $) }}
+  ca.crt: {{ include "common.secrets.lookup" (dict "secret" $secretName "key" "ca.crt" "defaultValue" $ca.Cert "context" $) }}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
