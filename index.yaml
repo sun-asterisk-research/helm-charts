@@ -698,6 +698,21 @@ entries:
   metabase:
   - apiVersion: v2
     appVersion: v0.53.1
+    created: "2025-02-08T22:27:32.702962516Z"
+    dependencies:
+    - name: tplchart
+      repository: oci://ghcr.io/sun-asterisk-research/helm-charts
+      version: 0.2.0
+    description: The simplest, fastest way to get business intelligence and analytics
+      to everyone in your company.
+    digest: c5bef3df1ca366d38d35703fcd96a51b2265060b6e9646214439f197bfe57542
+    name: metabase
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/metabase-1.0.6/metabase-1.0.6.tgz
+    version: 1.0.6
+  - apiVersion: v2
+    appVersion: v0.53.1
     created: "2025-02-08T22:02:12.195173588Z"
     dependencies:
     - name: tplchart
@@ -1105,4 +1120,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/tplchart-0.1.0/tplchart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-02-08T22:02:12.195311586Z"
+generated: "2025-02-08T22:27:32.703101547Z"
