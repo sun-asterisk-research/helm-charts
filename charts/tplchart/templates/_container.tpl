@@ -2,13 +2,17 @@
 Render container command or args, given a string or a slice.
 */}}
 {{- define "tplchart.containers.cmd" -}}
+{{- $cmd := list -}}
 {{- if kindIs "slice" . -}}
-{{- toYaml . -}}
+{{- $cmd = . -}}
 {{- else if kindIs "string" . -}}
-{{- splitList " " . | toYaml -}}
+{{- $cmd = splitList " " . -}}
 {{- else -}}
 {{- fail (printf "Invalid type for command. Expected string or slice. Got %s." (kindOf .)) -}}
 {{- end -}}
+{{ range $cmd -}}
+- {{ . | quote }}
+{{ end -}}
 {{- end -}}
 
 {{/*
