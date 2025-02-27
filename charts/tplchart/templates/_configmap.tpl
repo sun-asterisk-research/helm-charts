@@ -1,24 +1,22 @@
 {{- define "tplchart.configMap" -}}
-{{- $builtins := pick .context "Capabilities" "Chart" "Files" "Release" -}}
-{{- $ctx := merge $builtins (include "tplchart.utils.componentValues" . | fromYaml) -}}
-{{- with $ctx -}}
+{{- $Args := .Args | default dict -}}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ (include "tplchart.common.fullname" (dict "name" .Args.name "nameTemplate" .Args.nameTemplate "context" .)) }}
-  namespace: {{ include "common.names.namespace" . | quote }}
+  name: {{ (include "tplchart.common.fullname" (dict "name" $Args.name "nameTemplate" $Args.nameTemplate "context" .context)) }}
+  namespace: {{ include "common.names.namespace" .context | quote }}
   labels:
-    {{- include "tplchart.common.labels" (dict "customLabels" (list .Args.labels .Values.commonLabels) "component" .Args.component "context" .) | nindent 4 }}
-  {{- if or .Args.annotations .Values.commonAnnotations }}
+    {{- include "tplchart.common.labels" (dict "customLabels" (list $Args.labels .context.Values.commonLabels) "component" $Args.component "context" .context) | nindent 4 }}
+  {{- if or $Args.annotations .context.Values.commonAnnotations }}
   annotations:
-    {{- include "tplchart.utils.renderDicts" (dict "values" (list .Args.annotations .Values.commonAnnotations) "context" .) | nindent 4 -}}
+    {{- include "tplchart.utils.renderDicts" (dict "values" (list $Args.annotations .context.Values.commonAnnotations) "context" .context) | nindent 4 -}}
   {{- end }}
 data:
-  {{- if kindIs "string" .Args.data -}}
-  {{ .Args.data | nindent 2 }}
+  {{- if kindIs "string" $Args.data -}}
+  {{ $Args.data | nindent 2 }}
   {{- else -}}
-  {{- range $key, $value := .Args.data }}
+  {{- range $key, $value := $Args.data }}
   {{- if $value | toString | contains "\n" }}
   {{ $key }}: |-
     {{ $value | nindent 4 }}
@@ -27,5 +25,4 @@ data:
   {{- end }}
   {{- end }}
   {{- end -}}
-{{- end -}}
 {{- end -}}

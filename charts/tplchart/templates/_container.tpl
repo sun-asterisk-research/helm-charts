@@ -54,61 +54,60 @@ httpGet:
 Render container in a pod
 */}}
 {{- define "tplchart.container" -}}
-{{- $builtins := pick .context "Capabilities" "Chart" "Files" "Release" -}}
-{{- $ctx := merge $builtins (include "tplchart.utils.componentValues" . | fromYaml) -}}
-{{- with $ctx -}}
-name: {{ .Args.name | default .Chart.Name }}
-{{- if (.Values.containerSecurityContext).enabled }}
-securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 2 }}
+{{- $Values := include "tplchart.utils.scopedValues" . | fromYaml -}}
+{{- $Args := .Args | default dict -}}
+name: {{ $Args.name | default .context.Chart.Name }}
+{{- if ($Values.containerSecurityContext).enabled }}
+securityContext: {{- omit $Values.containerSecurityContext "enabled" | toYaml | nindent 2 }}
 {{- end }}
-image: {{ typeIs "string" .Args.image | ternary (.Args.image) (include "common.images.image" (dict "imageRoot" .Args.image "global" .Values.global)) }}
-imagePullPolicy: {{ default (eq .Args.image.tag "latest" | ternary "Always" "IfNotPresent") .Args.image.pullPolicy }}
-{{- if .Args.command }}
+image: {{ typeIs "string" $Args.image | ternary ($Args.image) (include "common.images.image" (dict "imageRoot" $Args.image "global" .context.Values.global)) }}
+imagePullPolicy: {{ default (eq $Args.image.tag "latest" | ternary "Always" "IfNotPresent") $Args.image.pullPolicy }}
+{{- if $Args.command }}
 command:
-  {{- include "tplchart.containers.cmd" .Args.command | nindent 2 }}
+  {{- include "tplchart.containers.cmd" $Args.command | nindent 2 }}
 {{- end }}
-{{- if .Args.args }}
+{{- if $Args.args }}
 args:
-  {{- include "tplchart.containers.cmd" .Args.args | nindent 2 }}
+  {{- include "tplchart.containers.cmd" $Args.args | nindent 2 }}
 {{- end }}
-{{- if or .Args.envVars .Values.extraEnvVars }}
+{{- if or $Args.envVars $Values.extraEnvVars }}
 env:
-  {{- if .Args.envVars -}}
-  {{- include "tplchart.containers.envVars" (dict "values" .Args.envVars "context" .) | indent 2 }}
+  {{- if $Args.envVars -}}
+  {{- include "tplchart.containers.envVars" (dict "values" $Args.envVars "context" .) | indent 2 }}
   {{- end -}}
-  {{- if .Values.extraEnvVars -}}
-  {{- include "tplchart.containers.envVars" (dict "values" .Values.extraEnvVars "context" .) | indent 2 }}
+  {{- if $Values.extraEnvVars -}}
+  {{- include "tplchart.containers.envVars" (dict "values" $Values.extraEnvVars "context" .) | indent 2 }}
   {{- end -}}
 {{- end }}
-{{- if or .Args.envVarsCM .Args.envVarsSecret .Values.envVarsCM .Values.envVarsSecret }}
+{{- if or $Args.envVarsCM $Args.envVarsSecret $Values.envVarsCM $Values.envVarsSecret }}
 envFrom:
-  {{- if .Args.envVarsCM }}
+  {{- if $Args.envVarsCM }}
   - configMapRef:
-      name: {{ include "common.tplvalues.render" (dict "value" .Args.envVarsCM "context" .) }}
+      name: {{ include "common.tplvalues.render" (dict "value" $Args.envVarsCM "context" .) }}
   {{- end }}
-  {{- if .Args.envVarsSecret }}
+  {{- if $Args.envVarsSecret }}
   - secretRef:
-      name: {{ include "common.tplvalues.render" (dict "value" .Args.envVarsSecret "context" .) }}
+      name: {{ include "common.tplvalues.render" (dict "value" $Args.envVarsSecret "context" .) }}
   {{- end }}
-  {{- if .Values.envVarsCM }}
+  {{- if $Values.envVarsCM }}
   - configMapRef:
-      name: {{ include "common.tplvalues.render" (dict "value" .Values.envVarsCM "context" .) }}
+      name: {{ include "common.tplvalues.render" (dict "value" $Values.envVarsCM "context" .) }}
   {{- end }}
-  {{- if .Values.envVarsSecret }}
+  {{- if $Values.envVarsSecret }}
   - secretRef:
-      name: {{ include "common.tplvalues.render" (dict "value" .Values.envVarsSecret "context" .) }}
+      name: {{ include "common.tplvalues.render" (dict "value" $Values.envVarsSecret "context" .) }}
   {{- end }}
 {{- end }}
-{{- if .Args.ports }}
+{{- if $Args.ports }}
 ports:
-  {{- if kindIs "map" .Args.ports -}}
-  {{- range $port, $number := .Args.ports }}
+  {{- if kindIs "map" $Args.ports -}}
+  {{- range $port, $number := $Args.ports }}
   - name: {{ $port }}
     containerPort: {{ $number }}
     protocol: TCP
   {{- end }}
-  {{- else if kindIs "slice" .Args.ports -}}
-  {{- range .Args.ports }}
+  {{- else if kindIs "slice" $Args.ports -}}
+  {{- range $Args.ports }}
   - name: {{ .name }}
     containerPort: {{ .containerPort }}
     protocol: {{ .protocol | default "TCP" }}
@@ -121,42 +120,41 @@ ports:
   {{- end }}
   {{- end -}}
 {{- end }}
-{{- with merge (.Args.livenessProbe | default dict) (.Values.livenessProbe | default dict) }}
+{{- with merge ($Args.livenessProbe | default dict) ($Values.livenessProbe | default dict) }}
 {{- if .enabled }}
 livenessProbe:
   {{- omit . "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
 {{- end }}
-{{- with merge (.Args.readinessProbe | default dict) (.Values.readinessProbe | default dict) }}
+{{- with merge ($Args.readinessProbe | default dict) ($Values.readinessProbe | default dict) }}
 {{- if .enabled }}
 readinessProbe:
   {{- omit . "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
 {{- end }}
-{{- with merge (.Args.startupProbe | default dict) (.Values.startupProbe | default dict) }}
+{{- with merge ($Args.startupProbe | default dict) ($Values.startupProbe | default dict) }}
 {{- if .enabled }}
 startupProbe:
   {{- omit . "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
 {{- end }}
-{{- with merge (.Args.lifecycleHooks | default dict) (.Values.lifecycleHooks | default dict) }}
+{{- with merge ($Args.lifecycleHooks | default dict) ($Values.lifecycleHooks | default dict) }}
 {{- if not (empty .) }}
 lifecycle:
   {{- include "common.tplvalues.render" (dict "value" . "context" .) | nindent 2 }}
 {{- end }}
 {{- end }}
-{{- if .Values.resources }}
+{{- if $Values.resources }}
 resources:
-  {{- toYaml .Values.resources | nindent 2 }}
+  {{- toYaml $Values.resources | nindent 2 }}
 {{- end }}
-{{- if or .Args.volumeMounts .Values.extraVolumeMounts }}
+{{- if or $Args.volumeMounts $Values.extraVolumeMounts }}
 volumeMounts:
-  {{- if .Args.volumeMounts }}
-  {{- include "tplchart.utils.renderYaml" .Args.volumeMounts | nindent 2 }}
+  {{- if $Args.volumeMounts }}
+  {{- include "tplchart.utils.renderYaml" $Args.volumeMounts | nindent 2 }}
   {{- end }}
-  {{- if .Values.extraVolumeMounts }}
-  {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" .) | nindent 2 }}
+  {{- if $Values.extraVolumeMounts }}
+  {{- include "common.tplvalues.render" (dict "value" $Values.extraVolumeMounts "context" .) | nindent 2 }}
   {{- end }}
 {{- end }}
-{{- end -}}
 {{- end -}}

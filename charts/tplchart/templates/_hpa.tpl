@@ -1,57 +1,54 @@
 {{- define "tplchart.hpa" -}}
-{{- $builtins := pick .context "Capabilities" "Chart" "Files" "Release" -}}
-{{- $ctx := merge $builtins (include "tplchart.utils.componentValues" . | fromYaml) -}}
-{{- with $ctx -}}
-{{- if .Values.autoscaling.enabled }}
+{{- $Values := include "tplchart.utils.scopedValues" . | fromYaml -}}
+{{- if $Values.autoscaling.enabled }}
 ---
-apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" .) }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" .context) }}
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "common.names.fullname" . }}
-  namespace: {{ include "common.names.namespace" . | quote }}
+  name: {{ include "common.names.fullname" .context }}
+  namespace: {{ include "common.names.namespace" .context | quote }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" .) | nindent 4 }}
+    {{- include "common.labels.standard" .context | nindent 4 }}
+    {{- if .context.Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .context.Values.commonLabels "context" .context) | nindent 4 }}
     {{- end }}
-  {{- if .Values.commonAnnotations }}
-  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" .) | nindent 4 }}
+  {{- if .context.Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .context.Values.commonAnnotations "context" .context) | nindent 4 }}
   {{- end }}
 spec:
   scaleTargetRef:
-    apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+    apiVersion: {{ include "common.capabilities.deployment.apiVersion" .context }}
     kind: Deployment
-    name: {{ include "common.names.fullname" . }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+    name: {{ include "common.names.fullname" .context }}
+  minReplicas: {{ $Values.autoscaling.minReplicas }}
+  maxReplicas: {{ $Values.autoscaling.maxReplicas }}
   metrics:
-  {{- if .Values.autoscaling.targetCPU }}
+  {{- if $Values.autoscaling.targetCPU }}
     - type: Resource
       resource:
         name: cpu
       {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
-        targetAverageUtilization: {{ .Values.autoscaling.targetCPU }}
+        targetAverageUtilization: {{ $Values.autoscaling.targetCPU }}
       {{- else }}
         target:
           type: Utilization
-          averageUtilization: {{ .Values.autoscaling.targetCPU }}
+          averageUtilization: {{ $Values.autoscaling.targetCPU }}
       {{- end }}
   {{- end }}
-  {{- if .Values.autoscaling.targetMemory }}
+  {{- if $Values.autoscaling.targetMemory }}
     - type: Resource
       resource:
         name: memory
       {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
-        targetAverageUtilization: {{ .Values.autoscaling.targetMemory }}
+        targetAverageUtilization: {{ $Values.autoscaling.targetMemory }}
       {{- else }}
         target:
           type: Utilization
-          averageUtilization: {{ .Values.autoscaling.targetMemory }}
+          averageUtilization: {{ $Values.autoscaling.targetMemory }}
       {{- end }}
   {{- end }}
-  {{- if .Values.autoscaling.metrics }}
-  {{- include "common.tplvalues.render" (dict "value" .Values.autoscaling.metrics "context" $) | nindent 4 }}
+  {{- if $Values.autoscaling.metrics }}
+  {{- include "common.tplvalues.render" (dict "value" $Values.autoscaling.metrics "context" $) | nindent 4 }}
   {{- end }}
 {{- end }}
-{{- end -}}
 {{- end -}}

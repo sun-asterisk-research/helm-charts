@@ -51,26 +51,12 @@ app.kubernetes.io/component: {{ .component | quote }}
 {{- include "common.tplvalues.render" (dict "value" $values "context" .context) -}}
 {{- end -}}
 
-{{/*
-Render ServiceAccount name
-{{ include "tplchart.serviceAccountName" . }}
-*/}}
-{{- define "tplchart.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-  {{- default (include "common.names.fullname" .) .Values.serviceAccount.name -}}
-{{- else -}}
-  {{- default "default" .Values.serviceAccount.name -}}
+{{- define "tplchart.utils.scopedValues" -}}
+{{- $values := .context.Values -}}
+{{- if .Scope -}}
+{{- $values = index $values .Scope -}}
 {{- end -}}
-{{- end -}}
-
-{{/*
-Render a YAML to use as values for a component template, as if all component values are placed at root.
-{{ include "tplchart.utils.componentValues" . | fromYaml }}
-*/}}
-{{- define "tplchart.utils.componentValues" -}}
-{{- $commonValues := pick .context.Values "global" "nameOverride" "fullnameOverride" "commonLabels" "commonAnnotations" -}}
-{{- $componentValues := .values -}}
-{{- dict "Values" (mergeOverwrite $commonValues $componentValues) "Args" (.args | default dict) | toYaml -}}
+{{- toYaml $values -}}
 {{- end -}}
 
 {{- define "tplchart.utils.debugDump" -}}
