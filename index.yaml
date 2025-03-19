@@ -1081,6 +1081,19 @@ entries:
     version: 0.1.0
   tplchart:
   - apiVersion: v2
+    created: "2025-03-19T08:35:28.923725642Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 2.23.0
+    description: Templates to create components with commonly used values
+    digest: d575ded606892880e1e0b7f09c4353a1d53f8c90a7faa5bf8545f847801f086c
+    name: tplchart
+    type: library
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/tplchart-0.4.0/tplchart-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
     created: "2025-02-27T10:57:08.180379864Z"
     dependencies:
     - name: common
@@ -1146,4 +1159,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/tplchart-0.1.0/tplchart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-02-27T10:57:08.180497394Z"
+generated: "2025-03-19T08:35:28.923829926Z"
