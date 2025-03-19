@@ -1,16 +1,16 @@
 {{- define "tplchart.ingress" -}}
 {{- $Values := include "tplchart.utils.scopedValues" . | fromYaml -}}
 {{- $Args := .Args | default dict -}}
-{{- if $Values.ingress.enabled -}}
-{{- $svcName := include "common.ingress.backend" (dict "serviceName" $Args.serviceName "servicePort" $Args.servicePort "context" .context) -}}
+{{- $svcName := include "tplchart.renderName" (dict "name" $Args.service.name "nameTemplate" $Args.service.nameTemplate "context" .context) -}}
+{{- $backend := include "common.ingress.backend" (dict "serviceName" $svcName "servicePort" $Args.service.port "context" .context) -}}
 ---
 apiVersion: {{ include "common.capabilities.ingress.apiVersion" .context }}
 kind: Ingress
 metadata:
-  name: {{ (include "tplchart.common.fullname" (dict "name" $Args.name "nameTemplate" $Args.nameTemplate "context" .context)) }}
+  name: {{ (include "tplchart.renderName" (dict "name" $Args.name "nameTemplate" $Args.nameTemplate "context" .context)) }}
   namespace: {{ include "common.names.namespace" .context | quote }}
   labels:
-    {{- include "tplchart.common.labels" (dict "customLabels" (list $Args.labels $Values.ingress.labels .context.Values.commonLabels) "component" $Args.component "context" .context) | nindent 4 }}
+    {{- include "tplchart.labels" (dict "customLabels" (list $Args.labels $Values.ingress.labels .context.Values.commonLabels) "component" $Args.component "context" .context) | nindent 4 }}
   {{- if or $Args.annotations $Values.ingress.annotations .context.Values.commonAnnotations }}
   annotations:
     {{- include "tplchart.utils.renderDicts" (dict "values" (list $Args.annotations $Values.ingress.annotations .context.Values.commonAnnotations) "context" .context) | nindent 4 -}}
@@ -31,7 +31,7 @@ spec:
             {{- if eq "true" (include "common.ingress.supportsPathType" .context) }}
             pathType: {{ $Values.ingress.pathType | default "ImplementationSpecific" }}
             {{- end }}
-            backend: {{- $svcName | nindent 14 }}
+            backend: {{- $backend | nindent 14 }}
     {{- end }}
     {{- range $Values.ingress.extraHosts }}
     - host: {{ include "common.tplvalues.render" (dict "value" .name "context" .context) | quote }}
@@ -41,7 +41,7 @@ spec:
             {{- if eq "true" (include "common.ingress.supportsPathType" .context) }}
             pathType: {{ .pathType | default "ImplementationSpecific" }}
             {{- end }}
-            backend: {{- $svcName | nindent 14 }}
+            backend: {{- $backend | nindent 14 }}
     {{- end }}
     {{- if $Values.ingress.extraRules }}
     {{- include "common.tplvalues.render" (dict "value" $Values.ingress.extraRules "context" .context) | nindent 4 }}
@@ -72,7 +72,7 @@ metadata:
   name: {{ $secretName }}
   namespace: {{ include "common.names.namespace" .context | quote }}
   labels:
-    {{- include "tplchart.common.labels" (dict "customLabels" .context.Values.commonLabels "component" $Args.component "context" .context) | nindent 4 }}
+    {{- include "tplchart.labels" (dict "customLabels" .context.Values.commonLabels "component" $Args.component "context" .context) | nindent 4 }}
   {{- if .context.Values.commonAnnotations }}
   annotations:
     {{- include "tplchart.utils.renderDicts" (dict "values" .context.Values.commonAnnotations "context" .context) | nindent 4 -}}
@@ -82,6 +82,5 @@ data:
   tls.crt: {{ include "common.secrets.lookup" (dict "secret" $secretName "key" "tls.crt" "defaultValue" $cert.Cert "context" $.context) }}
   tls.key: {{ include "common.secrets.lookup" (dict "secret" $secretName "key" "tls.key" "defaultValue" $cert.Key "context" $.context) }}
   ca.crt: {{ include "common.secrets.lookup" (dict "secret" $secretName "key" "ca.crt" "defaultValue" $ca.Cert "context" $.context) }}
-{{- end -}}
 {{- end -}}
 {{- end -}}

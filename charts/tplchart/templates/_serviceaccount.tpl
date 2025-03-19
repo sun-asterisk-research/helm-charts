@@ -17,7 +17,7 @@ metadata:
   name: {{ include "tplchart.serviceAccountName" (dict "context" .context "values" $Values.serviceAccount) }}
   namespace: {{ include "common.names.namespace" .context | quote }}
   labels:
-    {{- include "tplchart.common.labels" (dict "customLabels" (list $Args.labels $Values.serviceAccount.labels .context.Values.commonLabels) "component" $Args.component "context" .context) | nindent 4 }}
+    {{- include "tplchart.labels" (dict "customLabels" (list $Args.labels $Values.serviceAccount.labels .context.Values.commonLabels) "component" $Args.component "context" .context) | nindent 4 }}
   {{- if or $Args.annotations $Values.serviceAccount.annotations .context.Values.commonAnnotations }}
   annotations:
     {{- include "tplchart.utils.renderDicts" (dict "values" (list $Args.annotations $Values.serviceAccount.annotations .context.Values.commonAnnotations) "context" .context) | nindent 4 -}}

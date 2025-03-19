@@ -22,7 +22,7 @@
 {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Args.podLabels $Values.podLabels .context.Values.commonLabels) "context" .context) -}}
 metadata:
   labels:
-    {{- include "tplchart.common.labels" (dict "customLabels" $podLabels "component" .Args.component "context" .context) | nindent 4 }}
+    {{- include "tplchart.labels" (dict "customLabels" $podLabels "component" .Args.component "context" .context) | nindent 4 }}
   {{- if or .Args.podAnnotations $Values.podAnnotations .Args.checksumAnnotations }}
   annotations:
     {{- if or .Args.podAnnotations $Values.podAnnotations -}}

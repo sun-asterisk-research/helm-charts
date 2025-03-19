@@ -77,29 +77,33 @@ args:
 {{- if or $Args.envVars $Values.extraEnvVars }}
 env:
   {{- if $Args.envVars -}}
-  {{- include "tplchart.containers.envVars" (dict "values" $Args.envVars "context" .) | indent 2 }}
+  {{- include "tplchart.containers.envVars" (dict "values" $Args.envVars "context" .context) | indent 2 }}
   {{- end -}}
   {{- if $Values.extraEnvVars -}}
-  {{- include "tplchart.containers.envVars" (dict "values" $Values.extraEnvVars "context" .) | indent 2 }}
+  {{- include "tplchart.containers.envVars" (dict "values" $Values.extraEnvVars "context" .context) | indent 2 }}
   {{- end -}}
 {{- end }}
-{{- if or $Args.envVarsCM $Args.envVarsSecret $Values.envVarsCM $Values.envVarsSecret }}
+{{- if or $Args.envVarsCMs $Args.envVarsSecrets $Values.extraEnvVarsCM $Values.extraEnvVarsSecret }}
 envFrom:
-  {{- if $Args.envVarsCM }}
+  {{- if $Args.envVarsCMs }}
+  {{- range $Args.envVarsCMs }}
   - configMapRef:
-      name: {{ include "common.tplvalues.render" (dict "value" $Args.envVarsCM "context" .) }}
+      name: {{ include "tplchart.renderName" (dict "name" .name "nameTemplate" .nameTemplate "context" $.context) }}
   {{- end }}
-  {{- if $Args.envVarsSecret }}
-  - secretRef:
-      name: {{ include "common.tplvalues.render" (dict "value" $Args.envVarsSecret "context" .) }}
   {{- end }}
-  {{- if $Values.envVarsCM }}
+  {{- if $Values.extraEnvVarsCM }}
   - configMapRef:
-      name: {{ include "common.tplvalues.render" (dict "value" $Values.envVarsCM "context" .) }}
+      name: {{ include "common.tplvalues.render" (dict "value" $Values.extraEnvVarsCM "context" .context) }}
   {{- end }}
-  {{- if $Values.envVarsSecret }}
+  {{- if $Args.envVarsSecrets }}
+  {{- range $Args.envVarsSecrets }}
   - secretRef:
-      name: {{ include "common.tplvalues.render" (dict "value" $Values.envVarsSecret "context" .) }}
+      name: {{ include "tplchart.renderName" (dict "name" .name "nameTemplate" .nameTemplate "context" $.context) }}
+  {{- end }}
+  {{- end }}
+  {{- if $Values.extraEnvVarsSecret }}
+  - secretRef:
+      name: {{ include "common.tplvalues.render" (dict "value" $Values.extraEnvVarsSecret "context" .context) }}
   {{- end }}
 {{- end }}
 {{- if $Args.ports }}
@@ -145,7 +149,7 @@ startupProbe:
 {{- with merge ($Args.lifecycleHooks | default dict) ($Values.lifecycleHooks | default dict) }}
 {{- if not (empty .) }}
 lifecycle:
-  {{- include "common.tplvalues.render" (dict "value" . "context" .) | nindent 2 }}
+  {{- include "common.tplvalues.render" (dict "value" . "context" .context) | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- if $Values.resources }}
@@ -158,7 +162,7 @@ volumeMounts:
   {{- include "tplchart.utils.renderYaml" $Args.volumeMounts | nindent 2 }}
   {{- end }}
   {{- if $Values.extraVolumeMounts }}
-  {{- include "common.tplvalues.render" (dict "value" $Values.extraVolumeMounts "context" .) | nindent 2 }}
+  {{- include "common.tplvalues.render" (dict "value" $Values.extraVolumeMounts "context" .context) | nindent 2 }}
   {{- end }}
 {{- end }}
 {{- end -}}

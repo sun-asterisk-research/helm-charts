@@ -5,10 +5,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ (include "tplchart.common.fullname" (dict "name" $Args.name "nameTemplate" $Args.nameTemplate "context" .context)) }}
+  name: {{ (include "tplchart.renderName" (dict "name" $Args.name "nameTemplate" $Args.nameTemplate "context" .context)) }}
   namespace: {{ include "common.names.namespace" .context | quote }}
   labels:
-    {{- include "tplchart.common.labels" (dict "customLabels" (list $Args.labels $Values.service.labels .context.Values.commonLabels) "component" $Args.component "context" .context) | nindent 4 }}
+    {{- include "tplchart.labels" (dict "customLabels" (list $Args.labels $Values.service.labels .context.Values.commonLabels) "component" $Args.component "context" .context) | nindent 4 }}
   {{- if or $Args.annotations $Values.service.annotations .context.Values.commonAnnotations }}
   annotations:
     {{- include "tplchart.utils.renderDicts" (dict "values" (list $Args.annotations $Values.service.annotations .context.Values.commonAnnotations) "context" .context) | nindent 4 -}}
@@ -34,22 +34,22 @@ spec:
   {{- if or (eq $Values.service.type "LoadBalancer") (eq $Values.service.type "NodePort") }}
   externalTrafficPolicy: {{ $Values.service.externalTrafficPolicy }}
   {{- end }}
-  ports:
   {{- if $Args.ports }}
-    {{- $Args.ports | toYaml | nindent 4 }}
-  {{- else }}
-    {{- range $port, $number := $Values.service.ports }}
-    - name: {{ $port }}
-      protocol: {{ index ($Args.protocols | default dict) $port | default "TCP" }}
-      port: {{ $number }}
-      {{- $targetPort := index ($Values.service.targetPorts | default dict) $port | default $port }}
-      targetPort: {{ $targetPort }}
-      {{- $nodePort := index ($Values.service.nodePorts | default dict) $port }}
-      {{- if (and (list "NodePort" "LoadBalancer" | has $Values.service.type) (not (empty $nodePort))) }}
-      nodePort: {{ $nodePort }}
-      {{- end }}
+  ports:
+  {{- range $port, $number := $Args.ports }}
+  - name: {{ $port }}
+    protocol: {{ index ($Args.protocol | default dict) $port | default "TCP" }}
+    port: {{ $number }}
+    targetPort: {{ index ($Args.targetPorts | default dict) $port | default $port }}
+    {{- $nodePort := index ($Values.service.nodePorts | default dict) $port }}
+    {{- if (and (list "NodePort" "LoadBalancer" | has $Values.service.type) (not (empty $nodePort))) }}
+    nodePort: {{ $nodePort }}
     {{- end }}
   {{- end }}
+  {{- end }}
   selector:
-    {{- include "tplchart.common.matchLabels" (dict "customLabels" (list $Args.labels $Values.podLabels .context.Values.commonLabels) "component" $Args.component "context" .context) | nindent 4 -}}
+    {{- if $Args.selector }}
+    {{- include "tplchart.utils.renderDicts" (dict "values" $Args.selector "context" .context) -}}
+    {{- end }}
+    {{- include "tplchart.matchLabels" (dict "customLabels" (list $Args.labels $Values.podLabels .context.Values.commonLabels) "component" $Args.component "context" .context) | nindent 4 -}}
 {{- end -}}
