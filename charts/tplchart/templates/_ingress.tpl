@@ -27,6 +27,9 @@ spec:
           {{- if $Values.ingress.extraPaths }}
           {{- toYaml $Values.ingress.extraPaths | nindent 10 }}
           {{- end }}
+          {{- if $Args.extraPaths }}
+          {{- toYaml $Args.extraPaths | nindent 10 }}
+          {{- end }}
           - path: {{ $Values.ingress.path }}
             {{- if eq "true" (include "common.ingress.supportsPathType" .context) }}
             pathType: {{ $Values.ingress.pathType | default "ImplementationSpecific" }}

@@ -2,7 +2,7 @@ apiVersion: v2
 name: tplchart
 description: Templates to create components with commonly used values
 type: library
-version: 0.4.1
+version: 0.4.2
 dependencies:
 - name: common
   repository: oci://registry-1.docker.io/bitnamicharts
