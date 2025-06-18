@@ -38,21 +38,23 @@ spec:
   {{- if or $Args.initContainers $Values.initContainers }}
   initContainers:
     {{- if $Args.initContainers }}
+    {{ $context := .context -}}
     {{ range $i, $container := $Args.initContainers -}}
-    - {{ include "tplchart.container" (dict "context" .context "Scope" $Scope "Args" $container) | indent 6 | trim }}
-    {{ end }}
-    {{- end }}
+    - {{ include "tplchart.container" (dict "context" $context "Scope" $Scope "Args" $container) | indent 6 | trim }}
+    {{ end -}}
+    {{ end -}}
     {{- if $Values.initContainers }}
     {{- include "common.tplvalues.render" (dict "value" $Values.extraInitContainers "context" .context) | nindent 4 }}
     {{- end }}
   {{- end }}
   containers:
     - {{ include "tplchart.container" (dict "context" .context "Scope" $Scope "Args" $Args.container) | indent 6 | trim }}
-    {{- if $Args.sidecars }}
+    {{ if $Args.sidecars -}}
+    {{ $context := .context -}}
     {{ range $i, $container := $Args.sidecars -}}
-    - {{ include "tplchart.container" (dict "context" .context "Scope" $Scope "Args" $container) | indent 6 | trim }}
-    {{ end }}
-    {{- end }}
+    - {{ include "tplchart.container" (dict "context" $context "Scope" $Scope "Args" $container) | indent 6 | trim }}
+    {{ end -}}
+    {{ end -}}
   {{- if or $Args.volumes $Values.extraVolumes }}
   volumes:
     {{- if $Args.volumes }}
