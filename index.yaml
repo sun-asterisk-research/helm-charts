@@ -861,6 +861,21 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/metabase-0.1.3/metabase-0.1.3.tgz
     version: 0.1.3
+  nginx-s3-gateway:
+  - apiVersion: v2
+    appVersion: 2025.07.09
+    created: "2025-07-16T09:27:58.029809613Z"
+    dependencies:
+    - name: tplchart
+      repository: oci://ghcr.io/sun-asterisk-research/helm-charts
+      version: 0.4.2
+    description: A Helm chart for Kubernetes
+    digest: 096ecd5ccb52b3f0e110ac903cc9d455a4ff6845bba48e880b8b4cb32015c19d
+    name: nginx-s3-gateway
+    type: application
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/nginx-s3-gateway-0.1.0/nginx-s3-gateway-0.1.0.tgz
+    version: 0.1.0
   openedx:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -1185,4 +1200,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/tplchart-0.1.0/tplchart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-18T11:04:14.974132442Z"
+generated: "2025-07-16T09:27:58.176416116Z"
