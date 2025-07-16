@@ -1,0 +1,26 @@
+{{- define "nginx-s3-gateway.envCM" -}}
+{{- $s3Server := regexReplaceAll "^https?://([^:/]+).*" .Values.s3.endpoint "$1" -}}
+{{- $s3ServerProto := regexReplaceAll "^(https?)://.*$" .Values.s3.endpoint "$1" -}}
+{{- $s3ServerPortRaw := regexReplaceAll "^https?://[^:/]+:(\\d+).*" .Values.s3.endpoint "$1" -}}
+{{- $s3ServerPort := (regexMatch "^\\d+$" $s3ServerPortRaw | ternary $s3ServerPortRaw (ternary "443" "80" (eq $s3ServerProto "https"))) -}}
+
+DEBUG: {{ .Values.debug | quote }}
+
+S3_SERVER: {{ $s3Server | quote }}
+S3_SERVER_PROTO: {{ $s3ServerProto | quote }}
+S3_SERVER_PORT: {{ $s3ServerPort | quote }}
+S3_REGION: {{ .Values.s3.region | quote }}
+S3_BUCKET_NAME: {{ .Values.s3.bucket | quote }}
+S3_STYLE: {{ .Values.s3.usePathStyle | ternary "path" "virtual" | quote }}
+
+ALLOW_DIRECTORY_LIST: {{ .Values.allowDirectoryListing | ternary "true" "false" | quote }}
+AWS_SIGS_VERSION: {{ .Values.s3.signatureVersion | quote }}
+{{- end -}}
+
+{{- include "tplchart.configMap" (dict
+  "Args" (dict
+    "nameTemplate" "%s-env"
+    "data" (include "nginx-s3-gateway.envCM" .)
+  )
+  "context" .
+) -}}

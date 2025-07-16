@@ -1,0 +1,50 @@
+{{- $defaultTag := printf "unprivileged-oss-%s" (regexReplaceAll "\\." .Chart.AppVersion "") -}}
+{{- $args := dict
+  "checksumAnnotations" (dict
+    "nginxConf" "configmap-nginx.yaml"
+    "envCM"     "configmap-env.yaml"
+    "envSecret" "secret.yaml"
+  )
+  "container" (dict
+    "name" "nginx-s3-gateway"
+    "image" (empty .Values.image.tag | ternary (merge .Values.image (dict "tag" $defaultTag)) .Values.image)
+    "ports" (dict
+      "http" 8080
+    )
+    "envVarsCMs" (list
+      (dict "nameTemplate" "%s-env")
+    )
+    "envVarsSecrets" (list
+      (dict "nameTemplate" "%s")
+    )
+    "livenessProbe" (dict
+      "httpGet" (dict
+        "path" "/health"
+        "port" 8080
+      )
+    )
+    "readinessProbe" (dict
+      "httpGet" (dict
+        "path" "/health"
+        "port" 8080
+      )
+    )
+    "volumeMounts" (list
+      (dict
+        "name" "nginx-config"
+        "mountPath" "/etc/nginx/templates/gateway"
+      )
+    )
+  )
+  "serviceAccount" .Values.serviceAccount
+  "volumes" (list
+    (dict
+      "name" "nginx-config"
+      "configMap" (dict
+        "name" (include "tplchart.renderName" (dict "nameTemplate" "%s-config" "context" .))
+      )
+    )
+  )
+-}}
+
+{{ include "tplchart.deployment" (dict "context" . "Args" $args) }}

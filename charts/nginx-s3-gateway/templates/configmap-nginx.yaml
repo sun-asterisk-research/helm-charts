@@ -1,0 +1,22 @@
+{{- define "nginx-s3-gateway.nginxConfig" -}}
+{{- if index .Values.nginxConfig "s3_server.conf.template" }}
+s3_server.conf.template: |-
+  {{- index .Values.nginxConfig "s3_server.conf.template" | nindent 2 }}
+{{- end -}}
+{{- if index .Values.nginxConfig "s3_location.conf.template" }}
+s3_location.conf.template: |-
+  {{- index .Values.nginxConfig "s3_server.conf.template" | nindent 2 }}
+{{- end -}}
+{{- if index .Values.nginxConfig "s3listing_location.conf.template" }}
+s3listing_location.conf.template: |-
+  {{- index .Values.nginxConfig "s3_server.conf.template" | nindent 2 }}
+{{- end -}}
+{{- end -}}
+
+{{- include "tplchart.configMap" (dict
+  "Args" (dict
+    "nameTemplate" "%s-config"
+    "data" (include "nginx-s3-gateway.nginxConfig" .)
+  )
+  "context" .
+) -}}

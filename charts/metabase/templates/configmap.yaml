@@ -1,4 +1,4 @@
-{{- define "slack-message-analysis.envCM" -}}
+{{- define "metabase.envCM" -}}
 MB_SITE_NAME: {{ .Values.site.name | quote }}
 {{- if .Values.site.url }}
 MB_SITE_URL: {{ .Values.site.url | quote }}
@@ -34,7 +34,7 @@ JAVA_OPTS: {{ .Values.javaOpts | quote }}
 
 {{- include "tplchart.configMap" (dict
   "args" (dict
-    "data" (include "slack-message-analysis.envCM" .)
+    "data" (include "metabase.envCM" .)
   )
   "values" .Values
   "context" .

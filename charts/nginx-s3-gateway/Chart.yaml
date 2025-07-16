@@ -1,0 +1,10 @@
+apiVersion: v2
+name: nginx-s3-gateway
+description: A Helm chart for Kubernetes
+type: application
+version: 0.1.0
+appVersion: '2025.07.09'
+dependencies:
+- name: tplchart
+  repository: oci://ghcr.io/sun-asterisk-research/helm-charts
+  version: 0.4.2

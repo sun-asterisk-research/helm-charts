@@ -1,0 +1,239 @@
+## @section Global parameters
+##
+global:
+  ## @param global.imagePullSecrets Global image pull secrets
+  ##
+  imagePullSecrets: []
+
+## @section Common parameters
+##
+## @param nameOverride String to partially override `common.names.fullname`
+##
+nameOverride: ""
+
+## @param fullnameOverride String to fully override `common.names.fullname`
+##
+fullnameOverride: ""
+
+## @param image.registry Image registry
+## @param image.repository Image repository
+## @param image.tag Image tag (default to `.Chart.AppVersion`)
+## @param image.pullPolicy Image pull policy
+## @param image.pullSecrets Image pull secrets
+##
+image:
+  registry: docker.io
+  repository: nginxinc/nginx-s3-gateway
+  tag: ""
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+## @section Deployment parameters
+
+## @param replicaCount Number of deployment replicas
+##
+replicaCount: 1
+
+## @param livenessProbe.enabled Enable livenessProbe
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
+##
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
+## @param readinessProbe.enabled Enable readinessProbe
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
+##
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
+## @param resources.limits Resource limits for containers
+## @param resources.requests Resource requests for containers
+##
+resources:
+  limits: {}
+  requests: {}
+
+## @param podLabels Extra labels for pod
+##
+podLabels: {}
+
+## @param podAnnotations Annotations for pod
+##
+podAnnotations: {}
+
+## @param podSecurityContext.enabled Enable pod SecurityContext
+##
+podSecurityContext:
+  enabled: false
+
+## @param containerSecurityContext.enabled Enable container SecurityContext
+##
+containerSecurityContext:
+  enabled: false
+
+## @param podAffinityPreset Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`
+##
+podAffinityPreset: ""
+
+## @param podAntiAffinityPreset Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`
+##
+podAntiAffinityPreset: soft
+
+## @param nodeAffinityPreset.type Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard`
+## @param nodeAffinityPreset.key Node label key to match. Ignored if `affinity` is set
+## @param nodeAffinityPreset.values Node label values to match. Ignored if `affinity` is set
+##
+nodeAffinityPreset:
+  type: ""
+  key: ""
+  values: []
+
+## @param affinity Affinity for pod assignment. Evaluated as a template.
+##
+affinity: {}
+
+## @param nodeSelector  Node labels for pod assignment. Evaluated as a template.
+##
+nodeSelector: {}
+
+## @param tolerations Tolerations for pod assignment. Evaluated as a template.
+##
+tolerations: []
+
+## @param topologySpreadConstraints Topology Spread Constraints for pod assignment. Evaluated as a template
+##
+topologySpreadConstraints: []
+
+## @section Metabase configuration parameters
+##
+
+## @param debug Enable debug mode
+debug: false
+
+## @param s3.endpoint S3 endpoint URL
+## @param s3.region S3 region
+## @param s3.accessKey S3 access key
+## @param s3.secretKey S3 secret key
+## @param s3.bucket S3 bucket name
+## @param s3.usePathStyle Use path style access for S3
+##
+s3:
+  endpoint: ""
+  region: ""
+  accessKey: ""
+  secretKey: ""
+  bucket: ""
+  usePathStyle: false
+  signatureVersion: "4" # or "2"
+
+allowDirectoryListing: false
+
+nginxConfig:
+  s3_server.conf.template: ""
+  s3_location.conf.template: ""
+  s3listing_location.conf.template: ""
+
+## @param extraEnvVars Extra environment variables for containers
+##
+extraEnvVars: {}
+
+## @section Traffic exposure parameters
+##
+## @param service.type Kubernetes Service type
+## @param service.labels Additional labels for service
+## @param service.annotations Additional annotations for service
+## @param service.ports.http Port for NGINX container
+## @param service.nodePorts.http Port to bind to for NodePort service
+## @param service.clusterIP Service Cluster IP
+## @param service.loadBalancerIP loadBalancerIP if service type is `LoadBalancer`
+## @param service.loadBalancerSourceRanges Addresses that are allowed when service is `LoadBalancer`
+## @param service.externalTrafficPolicy Whether to route external traffic to node-local or cluster-wide endpoints
+##
+service:
+  type: ClusterIP
+  labels: {}
+  annotations: {}
+  ports:
+    http: 80
+  nodePorts:
+    http: ""
+  clusterIP: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  externalTrafficPolicy: Cluster
+
+## @param ingress.enabled Enable ingress resource generation
+## @param ingress.annotations Additional annotations for the Ingress resource
+## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+## @param ingress.hostname Default host's hostname for the ingress resource
+## @param ingress.path Default host's path for the ingress resource
+## @param ingress.tls Ingress Enable TLS configuration for the hostname defined at `ingress.hostname`
+## @param ingress.selfSigned Create a self-signed certificate for the hostname defined at `ingress.hostname`
+## @param ingress.existingSecret Use an existing secret for the hostname defined at `ingress.hostname`
+## @param ingress.secrets Create extra TLS secrets
+## @param ingress.extraHosts List of additional hostnames
+## @param ingress.extraPaths Additional paths for default host
+## @param ingress.extraTls Extra TLS configuration for default host
+## @param ingress.extraRules Additional ingress rules
+##
+ingress:
+  enabled: false
+  ingressClassName:
+  annotations: {}
+  hostname: nginx-s3-gateway.local
+  path: /
+  tls: false
+  selfSigned: false
+  existingSecret: ""
+  secrets: []
+  extraHosts: []
+  extraPaths: []
+  extraTls: []
+  extraRules: []
+
+## @section Persistence parameter
+##
+## @param persistence.enabled Enable persistence, only when using h2 database
+## @param persistence.annotations Additional custom annotations for the PVC
+## @param persistence.storageClass Persistent Volume storage class
+## @param persistence.accessModes Persistent Volume access modes
+## @param persistence.size Persistent Volume size
+##
+persistence:
+  enabled: false
+  annotations: {}
+  storageClass: ""
+  accessModes:
+  - ReadWriteOnce
+  size: 1Gi
+
+## @section ServiceAccount parameters
+##
+## @param serviceAccount.create Enable creation of ServiceAccount
+## @param serviceAccount.name The name of the ServiceAccount to use.
+## @param serviceAccount.annotations Annotations for service account. Evaluated as a template.
+## @param serviceAccount.automountServiceAccountToken Whether to auto mount the service account token
+##
+serviceAccount:
+  create: false
+  name: ""
+  annotations: {}
+  automountServiceAccountToken: true
