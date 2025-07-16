@@ -144,8 +144,13 @@ s3:
   usePathStyle: false
   signatureVersion: "4" # or "2"
 
+## @param allowDirectoryListing Whether to allow directory listing
 allowDirectoryListing: false
 
+## @param nginxConfig[s3_server.conf.template] NGINX S3 server configuration template
+## @param nginxConfig[s3_location.conf.template] NGINX S3 location configuration template
+## @param nginxConfig[s3listing_location.conf.template] NGINX S3 listing location
+##
 nginxConfig:
   s3_server.conf.template: ""
   s3_location.conf.template: ""

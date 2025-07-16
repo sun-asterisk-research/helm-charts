@@ -1,4 +1,26 @@
 {{- $defaultTag := printf "unprivileged-oss-%s" (regexReplaceAll "\\." .Chart.AppVersion "") -}}
+{{- $volumeMounts := list -}}
+{{- with index .Values.nginxConfig "s3_server.conf.template" }}
+  {{- $volumeMounts = append $volumeMounts (dict
+    "name" "nginx-config"
+    "mountPath" "/etc/nginx/templates/gateway/s3_server.conf.template"
+    "subPath" "s3_server.conf.template"
+  ) }}
+{{- end }}
+{{- with index .Values.nginxConfig "s3_location.conf.template" }}
+  {{- $volumeMounts = append $volumeMounts (dict
+    "name" "nginx-config"
+    "mountPath" "/etc/nginx/templates/gateway/s3_location.conf.template"
+    "subPath" "s3_location.conf.template"
+  ) }}
+{{- end }}
+{{- with index .Values.nginxConfig "s3listing_location.conf.template" }}
+  {{- $volumeMounts = append $volumeMounts (dict
+    "name" "nginx-config"
+    "mountPath" "/etc/nginx/templates/gateway/s3listing_location.conf.template"
+    "subPath" "s3listing_location.conf.template"
+  ) }}
+{{- end }}
 {{- $args := dict
   "checksumAnnotations" (dict
     "nginxConf" "configmap-nginx.yaml"
@@ -29,12 +51,7 @@
         "port" 8080
       )
     )
-    "volumeMounts" (list
-      (dict
-        "name" "nginx-config"
-        "mountPath" "/etc/nginx/templates/gateway"
-      )
-    )
+    "volumeMounts" $volumeMounts
   )
   "serviceAccount" .Values.serviceAccount
   "volumes" (list
