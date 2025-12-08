@@ -37,11 +37,11 @@ spec:
             backend: {{- $backend | nindent 14 }}
     {{- end }}
     {{- range $Values.ingress.extraHosts }}
-    - host: {{ include "common.tplvalues.render" (dict "value" .name "context" .context) | quote }}
+    - host: {{ include "common.tplvalues.render" (dict "value" .name "context" $.context) | quote }}
       http:
         paths:
           - path: {{ default "/" .path }}
-            {{- if eq "true" (include "common.ingress.supportsPathType" .context) }}
+            {{- if eq "true" (include "common.ingress.supportsPathType" $.context) }}
             pathType: {{ .pathType | default "ImplementationSpecific" }}
             {{- end }}
             backend: {{- $backend | nindent 14 }}
