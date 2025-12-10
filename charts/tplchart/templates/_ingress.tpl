@@ -16,8 +16,9 @@ metadata:
     {{- include "tplchart.utils.renderDicts" (dict "values" (list $Args.annotations $Values.ingress.annotations .context.Values.commonAnnotations) "context" .context) | nindent 4 -}}
   {{- end }}
 spec:
-  {{- if and $Values.ingress.ingressClassName (eq "true" (include "common.ingress.supportsIngressClassname" .context)) }}
-  ingressClassName: {{ include "common.tplvalues.render" (dict "value" $Values.ingress.ingressClassName "context" .context) | quote }}
+  {{- $ingressClassName := coalesce $Values.ingress.ingressClassName $Values.ingress.className -}}
+  {{- if and $ingressClassName (eq "true" (include "common.ingress.supportsIngressClassname" .context)) }}
+  ingressClassName: {{ include "common.tplvalues.render" (dict "value" $ingressClassName "context" .context) | quote }}
   {{- end }}
   rules:
     {{- if $Values.ingress.hostname }}
@@ -37,7 +38,7 @@ spec:
             backend: {{- $backend | nindent 14 }}
     {{- end }}
     {{- range $Values.ingress.extraHosts }}
-    - host: {{ include "common.tplvalues.render" (dict "value" .name "context" $.context) | quote }}
+    - host: {{ include "common.tplvalues.render" (dict "value" (coalesce .host .name) "context" $.context) | quote }}
       http:
         paths:
           - path: {{ default "/" .path }}
