@@ -31,11 +31,23 @@ spec:
           {{- if $Args.extraPaths }}
           {{- toYaml $Args.extraPaths | nindent 10 }}
           {{- end }}
-          - path: {{ $Values.ingress.path }}
-            {{- if eq "true" (include "common.ingress.supportsPathType" .context) }}
+          {{- $pathList := list -}}
+          {{- if $Values.ingress.paths }}
+            {{- $pathList = $Values.ingress.paths -}}
+          {{- else if $Values.ingress.path }}
+            {{- $pathList = list $Values.ingress.path -}}
+          {{- else if $Args.paths }}
+            {{- $pathList = $Args.paths -}}
+          {{- else if $Args.path }}
+            {{- $pathList = list $Args.path -}}
+          {{- end }}
+          {{- range $pathList }}
+          - path: {{ . }}
+            {{- if eq "true" (include "common.ingress.supportsPathType" $.context) }}
             pathType: {{ $Values.ingress.pathType | default "ImplementationSpecific" }}
             {{- end }}
             backend: {{- $backend | nindent 14 }}
+          {{- end }}
     {{- end }}
     {{- range $Values.ingress.extraHosts }}
     - host: {{ include "common.tplvalues.render" (dict "value" (coalesce .host .name) "context" $.context) | quote }}
