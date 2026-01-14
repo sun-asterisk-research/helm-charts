@@ -328,6 +328,20 @@ entries:
     version: 0.1.0
   common:
   - apiVersion: v2
+    appVersion: 1.3.1
+    created: "2026-01-14T03:41:05.181386235Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 2.31.4
+    description: A Library Helm Chart for grouping common logic
+    digest: cd3851dfcefdc61a65e6f38165cc26c5fc9ab563cc5cf7c1fa996f3f499caf9f
+    name: common
+    type: library
+    urls:
+    - https://github.com/sun-asterisk-research/helm-charts/releases/download/common-1.3.1/common-1.3.1.tgz
+    version: 1.3.1
+  - apiVersion: v2
     appVersion: 1.3.0
     created: "2026-01-14T02:57:48.901298706Z"
     dependencies:
@@ -1267,4 +1281,4 @@ entries:
     urls:
     - https://github.com/sun-asterisk-research/helm-charts/releases/download/tplchart-0.1.0/tplchart-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-14T02:57:48.901437556Z"
+generated: "2026-01-14T03:41:05.18151791Z"
