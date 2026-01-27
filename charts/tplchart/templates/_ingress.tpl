@@ -1,8 +1,8 @@
-{{- define "tplchart.ingress" -}}
-{{- $Values := include "tplchart.utils.scopedValues" . | fromYaml -}}
-{{- $Args := .Args | default dict -}}
-{{- $svcName := include "tplchart.renderName" (dict "name" $Args.service.name "nameTemplate" $Args.service.nameTemplate "context" .context) -}}
-{{- $backend := include "common.ingress.backend" (dict "serviceName" $svcName "servicePort" $Args.service.port "context" .context) -}}
+{{- define "tplchart.ingress" }}
+{{- $Values := include "tplchart.utils.scopedValues" . | fromYaml }}
+{{- $Args := .Args | default dict }}
+{{- $svcName := include "tplchart.renderName" (dict "name" $Args.service.name "nameTemplate" $Args.service.nameTemplate "context" .context) }}
+{{- $backend := include "common.ingress.backend" (dict "serviceName" $svcName "servicePort" $Args.service.port "context" .context) }}
 ---
 apiVersion: {{ include "common.capabilities.ingress.apiVersion" .context }}
 kind: Ingress
@@ -77,11 +77,11 @@ spec:
     {{- include "common.tplvalues.render" (dict "value" $Values.ingress.extraTls "context" .context) | nindent 4 }}
     {{- end }}
   {{- end }}
----
-{{- if and $Values.ingress.tls $Values.ingress.selfSigned -}}
+{{- if and $Values.ingress.tls $Values.ingress.selfSigned }}
 {{- $secretName := printf "%s-tls" $Values.ingress.hostname }}
 {{- $ca := genCA "kubernetes-ca" 365 }}
 {{- $cert := genSignedCert $Values.ingress.hostname nil (list $Values.ingress.hostname) 365 $ca }}
+---
 apiVersion: v1
 kind: Secret
 metadata:

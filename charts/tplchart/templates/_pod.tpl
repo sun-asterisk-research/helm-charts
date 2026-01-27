@@ -14,10 +14,36 @@
 {{- $Values := include "tplchart.utils.scopedValues" . | fromYaml -}}
 {{- $Args := .Args | default dict -}}
 {{/* Gather images from containers to render imagePullSecrets */}}
-{{- $containers := concat (list .Args.container) (.Args.sidecars | default list) (.Args.initContainers | default list)  -}}
+{{- $context := .context -}}
 {{- $images := list -}}
-{{- range $i, $container := $containers -}}
-  {{- $images = append $images $container.image -}}
+{{/*
+  Collect images from all containers for imagePullSecrets rendering.
+  Each image is resolved by merging scoped Values with Args, where Values takes precedence.
+  This mirrors the same image resolution logic used in tplchart.container template.
+  The final list of $images is used to determine which imagePullSecrets are needed.
+*/}}
+{{/* Main container: uses pod's Scope for Values lookup */}}
+{{- $mainImage := merge ($Values.image | default dict) ($Args.container.image | default dict) -}}
+{{- if not (empty $mainImage) -}}
+{{- $images = append $images $mainImage -}}
+{{- end -}}
+{{/* Init containers: each may have its own Scope, defaults to pod's Scope */}}
+{{- range $Args.initContainers | default list -}}
+{{- $initScope := .Scope | default $Scope -}}
+{{- $initValues := include "tplchart.utils.scopedValues" (dict "context" $context "Scope" $initScope) | fromYaml -}}
+{{- $initImage := merge ($initValues.image | default dict) ((.Args).image | default dict) -}}
+{{- if not (empty $initImage) -}}
+{{- $images = append $images $initImage -}}
+{{- end -}}
+{{- end -}}
+{{/* Sidecars: each may have its own Scope, defaults to pod's Scope */}}
+{{- range $Args.sidecars | default list -}}
+{{- $sidecarScope := .Scope | default $Scope -}}
+{{- $sidecarValues := include "tplchart.utils.scopedValues" (dict "context" $context "Scope" $sidecarScope) | fromYaml -}}
+{{- $sidecarImage := merge ($sidecarValues.image | default dict) ((.Args).image | default dict) -}}
+{{- if not (empty $sidecarImage) -}}
+{{- $images = append $images $sidecarImage -}}
+{{- end -}}
 {{- end -}}
 {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list $Args.podLabels $Values.podLabels .context.Values.commonLabels) "context" .context) -}}
 metadata:
@@ -40,7 +66,8 @@ spec:
     {{- if $Args.initContainers }}
     {{ $context := .context -}}
     {{ range $i, $container := $Args.initContainers -}}
-    - {{ include "tplchart.container" (dict "context" $context "Scope" $Scope "Args" $container) | indent 6 | trim }}
+    {{ $initContainerScope := $container.Scope | default $Scope -}}
+    - {{ include "tplchart.container" (dict "context" $context "Scope" $initContainerScope "Args" $container.Args) | indent 6 | trim }}
     {{ end -}}
     {{ end -}}
     {{- if $Values.initContainers }}
@@ -52,7 +79,8 @@ spec:
     {{ if $Args.sidecars -}}
     {{ $context := .context -}}
     {{ range $i, $container := $Args.sidecars -}}
-    - {{ include "tplchart.container" (dict "context" $context "Scope" $Scope "Args" $container) | indent 6 | trim }}
+    {{ $sidecarScope := $container.Scope | default $Scope -}}
+    - {{ include "tplchart.container" (dict "context" $context "Scope" $sidecarScope "Args" $container.Args) | indent 6 | trim }}
     {{ end -}}
     {{ end -}}
   {{- if or $Args.volumes $Values.extraVolumes }}

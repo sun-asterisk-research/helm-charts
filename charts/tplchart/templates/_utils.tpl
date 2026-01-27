@@ -18,7 +18,10 @@
 {{- define "tplchart.utils.scopedValues" -}}
 {{- $values := .context.Values -}}
 {{- if .Scope -}}
-{{- $values = index $values .Scope -}}
+{{- $keys := splitList "." .Scope -}}
+{{- range $keys -}}
+{{- $values = index $values . -}}
+{{- end -}}
 {{- end -}}
 {{- toYaml $values -}}
 {{- end -}}

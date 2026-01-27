@@ -61,11 +61,17 @@ Render container in a pod
 {{- $Values := include "tplchart.utils.scopedValues" . | fromYaml -}}
 {{- $Args := .Args | default dict -}}
 name: {{ $Args.name | default .context.Chart.Name }}
-{{- if ($Values.containerSecurityContext).enabled }}
-securityContext: {{- omit $Values.containerSecurityContext "enabled" | toYaml | nindent 2 }}
+{{- with merge (omit ($Values.containerSecurityContext | default dict) "enabled") ($Args.securityContext | default dict) }}
+{{- if not (empty .) }}
+securityContext: {{- . | toYaml | nindent 2 }}
 {{- end }}
-image: {{ typeIs "string" $Args.image | ternary ($Args.image) (include "common.images.image" (dict "imageRoot" $Args.image "global" .context.Values.global)) }}
-imagePullPolicy: {{ default (eq $Args.image.tag "latest" | ternary "Always" "IfNotPresent") $Args.image.pullPolicy }}
+{{- end }}
+{{- $image := merge ($Values.image | default dict) ($Args.image | default dict) }}
+{{- if empty $image }}
+{{- fail "image is required: provide image in values or chart args" }}
+{{- end }}
+image: {{ include "common.images.image" (dict "imageRoot" $image "global" .context.Values.global) }}
+imagePullPolicy: {{ $image.pullPolicy | default (eq $image.tag "latest" | ternary "Always" "IfNotPresent") }}
 {{- if $Args.command }}
 command:
   {{- include "tplchart.containers.cmd" $Args.command | nindent 2 }}
@@ -128,25 +134,25 @@ ports:
   {{- end }}
   {{- end -}}
 {{- end }}
-{{- with merge ($Args.livenessProbe | default dict) ($Values.livenessProbe | default dict) }}
-{{- if .enabled }}
+{{- with merge ($Values.livenessProbe | default dict) ($Args.livenessProbe | default dict) }}
+{{- if and .enabled (ne ($Args.livenessProbe).enabled false) }}
 livenessProbe:
   {{- omit . "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
 {{- end }}
-{{- with merge ($Args.readinessProbe | default dict) ($Values.readinessProbe | default dict) }}
-{{- if .enabled }}
+{{- with merge ($Values.readinessProbe | default dict) ($Args.readinessProbe | default dict) }}
+{{- if and .enabled (ne ($Args.readinessProbe).enabled false) }}
 readinessProbe:
   {{- omit . "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
 {{- end }}
-{{- with merge ($Args.startupProbe | default dict) ($Values.startupProbe | default dict) }}
-{{- if .enabled }}
+{{- with merge ($Values.startupProbe | default dict) ($Args.startupProbe | default dict) }}
+{{- if and .enabled (ne ($Args.startupProbe).enabled false) }}
 startupProbe:
   {{- omit . "enabled" | include "tplchart.utils.renderYaml" | nindent 2 }}
 {{- end }}
 {{- end }}
-{{- with merge ($Args.lifecycleHooks | default dict) ($Values.lifecycleHooks | default dict) }}
+{{- with merge ($Values.lifecycleHooks | default dict) ($Args.lifecycleHooks | default dict) }}
 {{- if not (empty .) }}
 lifecycle:
   {{- include "common.tplvalues.render" (dict "value" . "context" .context) | nindent 2 }}
