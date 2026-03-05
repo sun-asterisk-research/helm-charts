@@ -1,0 +1,9 @@
+apiVersion: v2
+appVersion: v1.0.0
+description: A Helm chart for kube-oidc-proxy
+name: kube-oidc-proxy
+version: 0.1.0
+dependencies:
+- name: tplchart
+  repository: file://../tplchart
+  version: 0.6.0

@@ -1,0 +1,235 @@
+# Default values for kube-oidc-proxy.
+
+## @section Common parameters
+
+## @param nameOverride String to partially override common.names.fullname
+nameOverride: ""
+
+## @param fullnameOverride String to fully override common.names.fullname
+fullnameOverride: ""
+
+## @param commonLabels Labels to add to all deployed objects
+commonLabels: {}
+
+## @param commonAnnotations Annotations to add to all deployed objects
+commonAnnotations: {}
+
+## @section Image parameters
+
+## @param image.registry Image registry
+## @param image.repository Image repository
+## @param image.tag Image tag (defaults to .Chart.AppVersion)
+## @param image.pullPolicy Image pull policy
+## @param image.pullSecrets Image pull secrets
+image:
+  registry: quay.io
+  repository: jetstack/kube-oidc-proxy
+  tag: v0.3.0
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+## @section Deployment parameters
+
+## @param replicaCount Number of replicas
+replicaCount: 1
+
+## @param updateStrategy Deployment update strategy
+updateStrategy: {}
+
+## @param podLabels Extra labels for pods
+podLabels: {}
+
+## @param podAnnotations Extra annotations for pods
+podAnnotations: {}
+
+## @param podSecurityContext.enabled Enable pod SecurityContext
+podSecurityContext:
+  enabled: false
+
+## @param containerSecurityContext.enabled Enable container SecurityContext
+containerSecurityContext:
+  enabled: false
+
+## @param podAffinityPreset Pod affinity preset (soft or hard)
+podAffinityPreset: ""
+
+## @param podAntiAffinityPreset Pod anti-affinity preset (soft or hard)
+podAntiAffinityPreset: soft
+
+## @param nodeAffinityPreset.type Node affinity preset type
+## @param nodeAffinityPreset.key Node label key to match
+## @param nodeAffinityPreset.values Node label values to match
+nodeAffinityPreset:
+  type: ""
+  key: ""
+  values: []
+
+## @param affinity Affinity for pod assignment
+affinity: {}
+
+## @param nodeSelector Node labels for pod assignment
+nodeSelector: {}
+
+## @param tolerations Tolerations for pod assignment
+tolerations: []
+
+## @param topologySpreadConstraints Topology spread constraints
+topologySpreadConstraints: []
+
+## @param resources Resource requests and limits
+resources: {}
+
+## @param readinessProbe.enabled Enable readiness probe
+## @param readinessProbe.httpGet.path Readiness probe path
+## @param readinessProbe.httpGet.port Readiness probe port
+## @param readinessProbe.initialDelaySeconds Initial delay
+## @param readinessProbe.periodSeconds Period
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /ready
+    port: 8080
+  initialDelaySeconds: 15
+  periodSeconds: 10
+
+## @param livenessProbe.enabled Enable liveness probe
+livenessProbe:
+  enabled: false
+
+## @param initContainers Extra init containers
+initContainers: []
+
+## @param extraVolumeMounts Extra volume mounts for the main container
+extraVolumeMounts: []
+
+## @param extraVolumes Extra volumes for the pod
+extraVolumes: []
+
+## @section OIDC configuration
+## These values must be set for kube-oidc-proxy to work.
+
+## @param oidc.clientId OIDC provider client ID
+## @param oidc.issuerUrl OIDC issuer URL
+## @param oidc.usernameClaim JWT claim to use as username
+## @param oidc.caPEM PEM-encoded CA cert for OIDC issuer TLS verification
+## @param oidc.usernamePrefix Prefix for usernames
+## @param oidc.groupsClaim JWT claim for groups
+## @param oidc.groupsPrefix Prefix for groups
+## @param oidc.signingAlgs Allowed signing algorithms
+## @param oidc.requiredClaims Required JWT claims (key-value pairs)
+oidc:
+  clientId: ""
+  issuerUrl: ""
+  usernameClaim: ""
+  caPEM:
+  usernamePrefix:
+  groupsClaim:
+  groupsPrefix:
+  signingAlgs:
+    - RS256
+  requiredClaims: {}
+
+## @section TLS configuration
+
+## @param tls.secretName Existing TLS secret name (skips cert generation)
+## @param tls.sans Additional DNS SANs for the server certificate
+tls:
+  secretName: ""
+  sans: []
+  certManager:
+    enabled: false
+    ca:
+      crt: ""
+      key: ""
+      duration: 87600h0m0s
+      renewBefore: 2160h0m0s
+    server:
+      duration: 8760h0m0s
+      renewBefore: 720h0m0s
+
+## @section Token passthrough
+
+## @param tokenPassthrough.enabled Enable token passthrough
+## @param tokenPassthrough.audiences Token audiences for passthrough
+tokenPassthrough:
+  enabled: false
+  audiences: []
+
+## @section Extra impersonation headers
+
+## @param extraImpersonationHeaders.clientIP Add client IP header
+extraImpersonationHeaders:
+  clientIP: false
+
+## @param extraArgs Additional CLI arguments (key-value pairs)
+extraArgs: {}
+
+## @section Traffic exposure parameters
+
+## @param service.type Kubernetes Service type
+## @param service.labels Additional labels for service
+## @param service.annotations Additional annotations for service
+## @param service.ports.https Service port
+## @param service.nodePorts.https NodePort (when service type is NodePort)
+## @param service.loadBalancerIP LoadBalancer IP
+## @param service.loadBalancerSourceRanges Allowed source ranges for LoadBalancer
+## @param service.externalTrafficPolicy External traffic policy
+service:
+  type: ClusterIP
+  labels: {}
+  annotations: {}
+  ports:
+    https: 443
+  nodePorts:
+    https: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  externalTrafficPolicy: Cluster
+
+## @param ingress.enabled Enable ingress
+## @param ingress.annotations Ingress annotations
+## @param ingress.ingressClassName Ingress class name
+## @param ingress.hostname Default hostname
+## @param ingress.path Default path
+## @param ingress.pathType Path type
+## @param ingress.tls Enable TLS
+## @param ingress.selfSigned Create self-signed TLS certificate
+## @param ingress.existingSecret Use existing TLS secret
+## @param ingress.extraHosts Additional hosts
+## @param ingress.extraPaths Additional paths
+## @param ingress.extraTls Extra TLS configuration
+## @param ingress.extraRules Additional ingress rules
+ingress:
+  enabled: false
+  annotations: {}
+  ingressClassName: ""
+  hostname: chart-example.local
+  path: /
+  pathType: Prefix
+  tls: false
+  selfSigned: false
+  existingSecret: ""
+  extraHosts: []
+  extraPaths: []
+  extraTls: []
+  extraRules: []
+
+## @section Pod Disruption Budget
+
+## @param podDisruptionBudget.enabled Enable PDB
+## @param podDisruptionBudget.minAvailable Minimum available pods
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+## @section ServiceAccount parameters
+
+## @param serviceAccount.create Enable creation of ServiceAccount
+## @param serviceAccount.name ServiceAccount name
+## @param serviceAccount.annotations ServiceAccount annotations
+## @param serviceAccount.automountServiceAccountToken Auto mount token
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+  automountServiceAccountToken: true

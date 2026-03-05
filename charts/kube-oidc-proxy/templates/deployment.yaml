@@ -1,0 +1,23 @@
+{{- $args := dict
+  "checksumAnnotations" (dict
+    "config"  "secret_config.yaml"
+  )
+  "serviceAccount" .Values.serviceAccount
+  "container" (dict
+    "image" (empty .Values.image.tag | ternary (merge .Values.image (dict "tag" .Chart.AppVersion)) .Values.image)
+    "ports" (dict
+      "https" 8443
+      "readiness" 8080
+    )
+    "command" (list "kube-oidc-proxy")
+    "args" (include "kube-oidc-proxy.args" . | fromYamlArray)
+    "envVars" (include "kube-oidc-proxy.env" .)
+    "volumeMounts" (include "kube-oidc-proxy.volumeMounts" . | fromYamlArray)
+  )
+  "volumes" (include "kube-oidc-proxy.volumes" . | fromYamlArray)
+-}}
+
+{{- include "tplchart.deployment" (dict
+  "Args" $args
+  "context" .
+) -}}

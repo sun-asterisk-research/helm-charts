@@ -1,0 +1,6 @@
+dependencies:
+- name: tplchart
+  repository: file://../tplchart
+  version: 0.6.0
+digest: sha256:f100190a9eb58f6d452054f8cd1e34e42a877118ec9527043f83f2386c5e1b89
+generated: "2026-03-05T15:53:27.11856825+07:00"

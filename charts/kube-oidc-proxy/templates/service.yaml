@@ -1,0 +1,10 @@
+{{- $args := dict
+  "ports" (dict
+    "https" (.Values.service.ports.https | int)
+  )
+  "targetPorts" (dict
+    "https" 8443
+  )
+-}}
+
+{{- include "tplchart.service" (dict "Args" $args "context" .) -}}

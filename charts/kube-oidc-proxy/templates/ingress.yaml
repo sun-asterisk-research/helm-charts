@@ -1,0 +1,10 @@
+{{- if .Values.ingress.enabled -}}
+{{- $args := dict
+  "service" (dict
+    "name" (include "common.names.fullname" .)
+    "port" "https"
+  )
+-}}
+
+{{- include "tplchart.ingress" (dict "Args" $args "context" .) -}}
+{{- end -}}

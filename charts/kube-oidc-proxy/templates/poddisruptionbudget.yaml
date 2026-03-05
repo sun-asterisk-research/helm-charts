@@ -1,0 +1,14 @@
+{{- if .Values.podDisruptionBudget.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ include "common.names.namespace" . }}
+  labels:
+    {{- include "tplchart.labels" (dict "customLabels" (list .Values.commonLabels) "context" .) | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "tplchart.matchLabels" (dict "customLabels" (list .Values.commonLabels) "context" .) | nindent 6 }}
+{{- end }}
