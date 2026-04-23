@@ -1,0 +1,6 @@
+dependencies:
+- name: tplchart
+  repository: oci://ghcr.io/sun-asterisk-research/helm-charts
+  version: 0.6.0
+digest: sha256:dbcb6145138a23b6b2b05c5a820cd5290f3d148c8193245f0823fb758b3b4b27
+generated: "2026-04-23T15:20:05.036193804+07:00"

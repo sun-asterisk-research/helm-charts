@@ -1,0 +1,9 @@
+apiVersion: v2
+appVersion: "0.16.2"
+description: A simple web-based PostgreSQL database browser written in Go
+name: pgweb
+version: 0.1.0
+dependencies:
+- name: tplchart
+  repository: oci://ghcr.io/sun-asterisk-research/helm-charts
+  version: 0.6.0

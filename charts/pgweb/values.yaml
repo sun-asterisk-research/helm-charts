@@ -1,0 +1,200 @@
+## @section Common parameters
+
+## @param nameOverride String to partially override common.names.fullname
+nameOverride: ""
+
+## @param fullnameOverride String to fully override common.names.fullname
+fullnameOverride: ""
+
+## @param commonLabels Labels to add to all deployed objects
+commonLabels: {}
+
+## @param commonAnnotations Annotations to add to all deployed objects
+commonAnnotations: {}
+
+## @section Image parameters
+
+## @param image.registry Image registry
+## @param image.repository Image repository
+## @param image.tag Image tag (defaults to .Chart.AppVersion)
+## @param image.pullPolicy Image pull policy
+## @param image.pullSecrets Image pull secrets
+image:
+  registry: docker.io
+  repository: sosedoff/pgweb
+  tag: ""
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+## @section Deployment parameters
+
+## @param replicaCount Number of replicas
+replicaCount: 1
+
+## @param podLabels Extra labels for pods
+podLabels: {}
+
+## @param podAnnotations Extra annotations for pods
+podAnnotations: {}
+
+## @param podSecurityContext.enabled Enable pod SecurityContext
+podSecurityContext:
+  enabled: false
+
+## @param containerSecurityContext.enabled Enable container SecurityContext
+containerSecurityContext:
+  enabled: false
+
+## @param resources Resource requests and limits
+resources: {}
+
+## @param podAffinityPreset Pod affinity preset (soft or hard)
+podAffinityPreset: ""
+
+## @param podAntiAffinityPreset Pod anti-affinity preset (soft or hard)
+podAntiAffinityPreset: soft
+
+## @param nodeAffinityPreset.type Node affinity preset type
+## @param nodeAffinityPreset.key Node label key to match
+## @param nodeAffinityPreset.values Node label values to match
+nodeAffinityPreset:
+  type: ""
+  key: ""
+  values: []
+
+## @param affinity Affinity for pod assignment
+affinity: {}
+
+## @param nodeSelector Node labels for pod assignment
+nodeSelector: {}
+
+## @param tolerations Tolerations for pod assignment
+tolerations: []
+
+## @param topologySpreadConstraints Topology spread constraints
+topologySpreadConstraints: []
+
+## @param readinessProbe.enabled Enable readiness probe
+## @param readinessProbe.httpGet.path Readiness probe path
+## @param readinessProbe.httpGet.port Readiness probe port
+## @param readinessProbe.initialDelaySeconds Initial delay seconds
+## @param readinessProbe.periodSeconds Period seconds
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 8081
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+## @param livenessProbe.enabled Enable liveness probe
+## @param livenessProbe.httpGet.path Liveness probe path
+## @param livenessProbe.httpGet.port Liveness probe port
+## @param livenessProbe.initialDelaySeconds Initial delay seconds
+## @param livenessProbe.periodSeconds Period seconds
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 8081
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+## @section PostgreSQL connection parameters
+## Connection string is built automatically from these values.
+## Format: postgres://user:password@host:port/database?sslmode=<sslmode>
+
+## @param postgresql.host PostgreSQL server hostname
+## @param postgresql.port PostgreSQL server port
+## @param postgresql.database Database name to connect to
+## @param postgresql.username PostgreSQL username
+## @param postgresql.password PostgreSQL password
+## @param postgresql.sslmode SSL mode (disable, require, verify-ca, verify-full)
+postgresql:
+  host: ""
+  port: 5432
+  database: ""
+  username: ""
+  password: ""
+  sslmode: disable
+  ## @param postgresql.existingSecret Use an existing secret containing the DATABASE_URL key (ignores host/port/database/username/password when set)
+  existingSecret: ""
+
+## @section Pgweb configuration
+
+## @param pgweb.readOnly Enable read-only mode (prevents data modifications)
+## @param pgweb.bookmarksDir Path to bookmarks directory
+## @param pgweb.sessions Enable multiple database sessions
+## @param pgweb.lockSession Lock the connection to the configured database (disables session switching)
+pgweb:
+  readOnly: false
+  bookmarksDir: ""
+  sessions: false
+  lockSession: true
+
+## @param extraEnvVars Extra environment variables for the container
+extraEnvVars: {}
+
+## @section Traffic exposure parameters
+
+## @param service.type Kubernetes Service type
+## @param service.labels Additional labels for service
+## @param service.annotations Additional annotations for service
+## @param service.ports.http Service port
+## @param service.nodePorts.http NodePort (when service type is NodePort)
+## @param service.clusterIP Service Cluster IP
+## @param service.loadBalancerIP LoadBalancer IP
+## @param service.loadBalancerSourceRanges Allowed source ranges for LoadBalancer
+## @param service.externalTrafficPolicy External traffic policy
+service:
+  type: ClusterIP
+  labels: {}
+  annotations: {}
+  ports:
+    http: 8081
+  nodePorts:
+    http: ""
+  clusterIP: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  externalTrafficPolicy: Cluster
+
+## @param ingress.enabled Enable ingress
+## @param ingress.annotations Ingress annotations
+## @param ingress.ingressClassName Ingress class name
+## @param ingress.hostname Default hostname
+## @param ingress.path Default path
+## @param ingress.pathType Path type
+## @param ingress.tls Enable TLS
+## @param ingress.selfSigned Create self-signed TLS certificate
+## @param ingress.existingSecret Use existing TLS secret
+## @param ingress.extraHosts Additional hosts
+## @param ingress.extraPaths Additional paths
+## @param ingress.extraTls Extra TLS configuration
+## @param ingress.extraRules Additional ingress rules
+ingress:
+  enabled: false
+  annotations: {}
+  ingressClassName: ""
+  hostname: pgweb.local
+  path: /
+  pathType: Prefix
+  tls: false
+  selfSigned: false
+  existingSecret: ""
+  extraHosts: []
+  extraPaths: []
+  extraTls: []
+  extraRules: []
+
+## @section ServiceAccount parameters
+
+## @param serviceAccount.create Enable creation of ServiceAccount
+## @param serviceAccount.name ServiceAccount name
+## @param serviceAccount.annotations ServiceAccount annotations
+## @param serviceAccount.automountServiceAccountToken Auto mount token
+serviceAccount:
+  create: false
+  name: ""
+  annotations: {}
+  automountServiceAccountToken: true

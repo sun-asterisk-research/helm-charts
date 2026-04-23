@@ -1,0 +1,36 @@
+{{- $pgArgs := list "--bind=0.0.0.0" "--listen=8081" -}}
+{{- if .Values.pgweb.readOnly -}}
+  {{- $pgArgs = append $pgArgs "--readonly" -}}
+{{- end -}}
+{{- if .Values.pgweb.bookmarksDir -}}
+  {{- $pgArgs = append $pgArgs (printf "--bookmarks-dir=%s" .Values.pgweb.bookmarksDir) -}}
+{{- end -}}
+{{- if .Values.pgweb.sessions -}}
+  {{- $pgArgs = append $pgArgs "--sessions" -}}
+{{- end -}}
+{{- if .Values.pgweb.lockSession -}}
+  {{- $pgArgs = append $pgArgs "--lock-session" -}}
+{{- end -}}
+
+{{- $secretName := .Values.postgresql.existingSecret | default (include "common.names.fullname" .) -}}
+
+{{- $args := dict
+  "checksumAnnotations" (dict
+    "secret" "secret.yaml"
+  )
+  "serviceAccount" .Values.serviceAccount
+  "container" (dict
+    "image" (empty .Values.image.tag | ternary (merge .Values.image (dict "tag" .Chart.AppVersion)) .Values.image)
+    "ports" (dict
+      "http" 8081
+    )
+    "args" $pgArgs
+    "envVars" .Values.extraEnvVars
+    "envVarsSecrets" (list (dict "name" $secretName))
+  )
+-}}
+
+{{- include "tplchart.deployment" (dict
+  "Args" $args
+  "context" .
+) -}}
